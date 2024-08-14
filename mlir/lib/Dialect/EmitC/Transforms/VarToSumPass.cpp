@@ -103,7 +103,7 @@ struct VarToSumPass : public emitc::impl::VarToSumBase<VarToSumPass> {
 
       if (variable.use_empty()) {
         variable.erase();
-        llvm::outs() << "Variable empty\n\n";
+        llvm::outs() << "Var empty\n\n";
       }
     }
   }
