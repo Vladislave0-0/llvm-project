@@ -21,6 +21,10 @@ namespace emitc {
 /// Creates an instance of the C-style expressions forming pass.
 std::unique_ptr<Pass> createFormExpressionsPass();
 
+/// Each variable of type i32 is represented as the sum of two other 
+/// variables in all places where the original variable is used.
+std::unique_ptr<Pass> createVarToSumPass();
+
 //===----------------------------------------------------------------------===//
 // Registration
 //===----------------------------------------------------------------------===//

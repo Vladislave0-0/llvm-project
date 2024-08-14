@@ -21,4 +21,10 @@ def FormExpressions : Pass<"form-expressions"> {
   let dependentDialects = ["emitc::EmitCDialect"];
 }
 
+def VarToSum : Pass<"var-to-sum"> {
+  let summary = "Each variable of type i32 is represented as the sum of two other variables in all places where the original variable is used.";
+  let constructor = "mlir::emitc::createVarToSumPass()";
+  let dependentDialects = ["emitc::EmitCDialect"];
+}
+
 #endif // MLIR_DIALECT_EMITC_TRANSFORMS_PASSES
