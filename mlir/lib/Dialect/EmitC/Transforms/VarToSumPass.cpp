@@ -58,8 +58,8 @@ struct VarToSumPass : public emitc::impl::VarToSumBase<VarToSumPass> {
     builder.setInsertionPointAfter(variable);
 
     /// Bypassing all uses of the original variable. The variable can either 
-    /// already be used by an operation that is in etc, or used by a return 
-    /// operation, or used by an operation that is not wrapped in emitc
+    /// already be used by an operation emitc.expression, or used by a return 
+    /// operation, or used by an operation that is not wrapped in emitc.expression.
 
     for (auto &use : variable.getResult().getUses()) {
       Operation *userOp = use.getOwner();
