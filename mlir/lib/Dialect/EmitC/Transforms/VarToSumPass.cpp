@@ -17,88 +17,75 @@ using namespace mlir;
 using namespace emitc;
 
 namespace {
+
+/// 'VarToSumPass' converts `emitc.variable` operations containing 
+/// values of type 'i32' to the sum of two new variables in all 
+/// places where the original variable is used.
+
 struct VarToSumPass : public emitc::impl::VarToSumBase<VarToSumPass> {
 
   void runOnOperation() override {
     Operation *rootOp = getOperation();
 
-    // for (Region &region : rootOp->getRegions()) {
-    //   for (Block &block : region.getBlocks()) {
-    //     for (Operation &operation : block.getOperations()) {
-    //       if (isa<emitc::VariableOp>(operation)) {
-    //         llvm::outs() << "here";
-    //         auto variable = dyn_cast<emitc::VariableOp>(operation);
-    //         if (variable.getType().isInteger(32)) {
-    //           replaceVariableWithSum(variable, rootOp);
-    //           variable->erase();
-    //         }
-    //       } else {
-    //         llvm::outs() << "no\n";
-    //         llvm::outs() << operation.getName();
-    //       }
-    //     }
-    //   }
-    // }
-    WalkResult result = rootOp->walk([&](emitc::VariableOp variable) {
-      if (variable.getType().isInteger(32)) {
-        replaceVariableWithSum(variable, rootOp);
-        return WalkResult::interrupt();
-      }
-      return WalkResult::advance();
-    });
+    /// Collecting all 'emitc::Variable O p` operations into a vector for 
+    /// subsequent processing. In the last intermediate version, this was 
+    /// exactly the error. walk() bypassed all operations in the pass in 
+    /// the form of a doubly linked list. Deleting a specific operation in 
+    /// pace deleted pointers to the next operation, which caused an error 
+    /// in the form of a signal 9.
+
+    SmallVector<emitc::VariableOp> variablesVec;
+    rootOp->walk([&](emitc::VariableOp variable) { variablesVec.push_back(variable); });
+
+    for (auto &variable : variablesVec)
+      if (variable.getType().isInteger(32))
+        replaceVariableWithSum(variable);
   }
 
-  void replaceVariableWithSum(emitc::VariableOp variable,
-                              Operation *operationPtr) {
+  void replaceVariableWithSum(emitc::VariableOp variable) {
     OpBuilder builder(variable);
     builder.setInsertionPoint(variable);
 
+    int value = mlir::cast<IntegerAttr>(variable.getValue()).getInt();
+    int val1 = value / 2;
+
     auto type = variable.getType();
-    auto value = mlir::cast<IntegerAttr>(variable.getValue()).getInt();
     auto loc = variable.getLoc();
 
-    auto part1 = builder.create<emitc::VariableOp>(
-        loc, type, builder.getIntegerAttr(type, 0));
+    auto part1 = builder.create<emitc::VariableOp>(loc, type, builder.getIntegerAttr(type, val1));
+    auto part2 = builder.create<emitc::VariableOp>(loc, type, builder.getIntegerAttr(type, value - val1));
 
     builder.setInsertionPointAfter(variable);
 
+    /// Bypassing all uses of the original variable. The variable can either 
+    /// already be used by an operation that is in etc, or used by a return 
+    /// operation, or used by an operation that is not wrapped in emitc
+
     for (auto &use : variable.getResult().getUses()) {
-      llvm::outs() << "Зашли в for()\n\n";
       Operation *userOp = use.getOwner();
 
-      // Проверяем, находится ли использование в emitc.expression
-      if (auto exprOp = userOp->getParentOfType<emitc::ExpressionOp>()) {
-        llvm::outs() << "В emitc.expression\n\n";
+      if (userOp->getParentOfType<emitc::ExpressionOp>()) {
         builder.setInsertionPoint(userOp);
 
-        auto sum = builder.create<emitc::AddOp>(loc, type, part1,
-                                                variable.getResult());
+        auto sum = builder.create<emitc::AddOp>(loc, type, part1, part2);
         userOp->setOperand(use.getOperandNumber(), sum.getResult());
       }
 
-      // Если использование в emitc.return
-      else if (isa<emitc::ReturnOp, emitc::YieldOp>(userOp)) {
-        llvm::outs() << "В return\n\n";
-
+      else if (isa<emitc::ReturnOp>(userOp)) {
         builder.setInsertionPoint(userOp);
 
-        auto sum = builder.create<emitc::AddOp>(loc, type, part1,
-                                                variable.getResult());
+        auto sum = builder.create<emitc::AddOp>(loc, type, part1, part2);
         userOp->setOperand(0, sum.getResult());
       }
 
-      // Если не находится в emitc.expression, то оборачиваем в него
       else {
-        llvm::outs() << "Не в emitc.expression\n\n";
-
         builder.setInsertionPointAfter(userOp);
         auto expression = builder.create<emitc::ExpressionOp>(loc, type);
         Region &region = expression.getRegion();
         Block &block = region.emplaceBlock();
         builder.setInsertionPointToStart(&block);
 
-        auto sum = builder.create<emitc::AddOp>(loc, type, part1,
-                                                variable.getResult());
+        auto sum = builder.create<emitc::AddOp>(loc, type, part1, part2);
         auto newOp = builder.clone(*userOp);
 
         newOp->setOperand(use.getOperandNumber(), sum.getResult());
@@ -106,149 +93,23 @@ struct VarToSumPass : public emitc::impl::VarToSumBase<VarToSumPass> {
         userOp->replaceAllUsesWith(expression);
 
         userOp->erase();
-
-        // vectorOps.push_back(userOp);
-        // for (auto &use : userOp->getUses())
-        //   use.getOwner()->replaceUsesOfWith(userOp->getResult(0),
-        //   expression->getResult(0));
-
-        // userOp->erase();
-        // userOp->dropAllReferences();
       }
 
       if (variable.use_empty()) {
-        llvm::outs() << "Variable empty\n\n";
+        variable.erase();
       }
     }
   }
 
+
+  /// Registration of dependent dialects required for the operation of the pass.
   void getDependentDialects(DialectRegistry &registry) const override {
     registry.insert<emitc::EmitCDialect>();
   }
 };
 } // namespace
 
+/// A function for creating an instance of the `VarToSumPass` pass.
 std::unique_ptr<Pass> mlir::emitc::createVarToSumPass() {
   return std::make_unique<VarToSumPass>();
 }
-
-// #include "mlir/Dialect/EmitC/IR/EmitC.h"
-// #include "mlir/Dialect/EmitC/Transforms/Passes.h"
-// #include "mlir/Dialect/EmitC/Transforms/Transforms.h"
-// #include "mlir/IR/IRMapping.h"
-// #include "mlir/IR/PatternMatch.h"
-// #include "mlir/Transforms/GreedyPatternRewriteDriver.h"
-// #include "llvm/Support/Debug.h"
-
-// namespace mlir {
-// namespace emitc {
-// #define GEN_PASS_DEF_VARTOSUM
-// #include "mlir/Dialect/EmitC/Transforms/Passes.h.inc"
-// } // namespace emitc
-// } // namespace mlir
-
-// using namespace mlir;
-// using namespace emitc;
-
-// namespace {
-// struct VarToSumPass : public emitc::impl::VarToSumBase<VarToSumPass> {
-
-//   void runOnOperation() override {
-//     Operation *rootOp = getOperation();
-
-//     rootOp->walk([&](emitc::VariableOp variable) {
-//       if (variable.getType().isInteger(32)) {
-//         replaceVariableWithSum(variable, rootOp);
-
-//         // variable.getResult().replaceAllUsesWith({});
-//         // variable->erase();
-//       }
-//     });
-//   }
-
-//   void replaceVariableWithSum(emitc::VariableOp variable,
-//                               Operation *operationPtr) {
-//     OpBuilder builder(variable);
-//     builder.setInsertionPointAfter(variable);
-
-//     auto type = variable.getType();
-//     auto value = mlir::cast<IntegerAttr>(variable.getValue()).getInt();
-//     auto loc = variable.getLoc();
-
-//     auto part1 = builder.create<emitc::VariableOp>(
-//         loc, type, builder.getIntegerAttr(type, 0));
-//     auto part2 = builder.create<emitc::VariableOp>(
-//         loc, type, builder.getIntegerAttr(type, value));
-
-//     SmallVector<Operation *> vectorOps;
-
-//     for (;iteratorUses != iteratopUsesEnd;) {
-
-//       llvm::outs() << "Зашли в for()\n\n";
-//       Operation *userOp = (*iteratorUses).getOwner();
-
-//       // Проверяем, находится ли использование в emitc.expression
-//       if (auto exprOp = userOp->getParentOfType<emitc::ExpressionOp>()) {
-//         llvm::outs() << "В emitc.expression\n\n";
-//         builder.setInsertionPoint(userOp);
-
-//         auto sum = builder.create<emitc::AddOp>(loc, type, part1, part2);
-//         userOp->setOperand((*iteratorUses).getOperandNumber(),
-//         sum.getResult());
-//       }
-
-//       // Если использование в emitc.return
-//       else if (isa<emitc::ReturnOp, emitc::YieldOp>(userOp)) {
-//         llvm::outs() << "В return\n\n";
-
-//         builder.setInsertionPoint(userOp);
-
-//         auto sum = builder.create<emitc::AddOp>(loc, type, part1, part2);
-//         userOp->setOperand(0, sum.getResult());
-//       }
-
-//       // Если не находится в emitc.expression, то оборачиваем в него
-//       else {
-//         llvm::outs() << "Не в emitc.expression\n\n";
-
-//         builder.setInsertionPointAfter(userOp);
-//         auto expression = builder.create<emitc::ExpressionOp>(loc, type);
-//         Region &region = expression.getRegion();
-//         Block &block = region.emplaceBlock();
-//         builder.setInsertionPointToStart(&block);
-
-//         auto sum = builder.create<emitc::AddOp>(loc, type, part1, part2);
-//         auto newOp = builder.clone(*userOp);
-
-//         newOp->setOperand((*iteratorUses).getOperandNumber(),
-//         sum.getResult()); builder.create<emitc::YieldOp>(loc,
-//         newOp->getResult(0)); userOp->replaceAllUsesWith(expression);
-
-//         iteratorUses++;
-//         userOp->erase();
-
-//         // vectorOps.push_back(userOp);
-//         // for (auto &use : userOp->getUses())
-//         //   use.getOwner()->replaceUsesOfWith(userOp->getResult(0),
-//         //   expression->getResult(0));
-
-//         // userOp->erase();
-//         // userOp->dropAllReferences();
-//       }
-
-//       if (variable.use_empty()) {
-//         variable.erase();
-//         llvm::outs() << "Variable empty\n\n";
-//       }
-//     }
-//   }
-
-//   void getDependentDialects(DialectRegistry &registry) const override {
-//     registry.insert<emitc::EmitCDialect>();
-//   }
-// };
-// } // namespace
-
-// std::unique_ptr<Pass> mlir::emitc::createVarToSumPass() {
-//   return std::make_unique<VarToSumPass>();
-// }
