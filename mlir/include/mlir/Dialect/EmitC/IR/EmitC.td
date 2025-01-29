@@ -1479,4 +1479,75 @@ def EmitC_SwitchOp : EmitC_Op<"switch", [RecursiveMemoryEffects,
   let hasVerifier = 1;
 }
 
+def EmitC_WhileOp : EmitC_Op<"while",
+      [DeclareOpInterfaceMethods<RegionBranchOpInterface, [
+         "getNumRegionInvocations", "getRegionInvocationBounds",
+         "getEntrySuccessorRegions"]>, 
+       OpAsmOpInterface, SingleBlockImplicitTerminator<"emitc::YieldOp">,
+       RecursiveMemoryEffects, NoRegionArguments]> {
+
+  let summary = "While operation";
+  let description = [{So far, without this}];
+
+  let arguments = (ins I1:$condition);
+  let results = (outs Variadic<AnyType>:$results);
+  let regions = (region SizedRegion<1>:$region);
+
+  let skipDefaultBuilders = 1;
+  let builders = [
+    OpBuilder<(ins "Value":$condition, 
+      CArg<"function_ref<void(OpBuilder &, Location)>", "nullptr">:$bodyBuilder)>
+  ];
+
+  let extraClassDeclaration = [{
+    using BodyBuilderFn = function_ref<void(OpBuilder &, Location)>;
+
+    /// Returns the condition SSA value.
+    Value getCondition() { return getOperand(0); }
+
+    /// Sets the condition of the loop.
+    void setCondition(Value condition) { getOperation()->setOperand(0, condition); }
+
+    //===------------------------------------------------------------------===//
+    // RegionBranchOpInterface Methods
+    //===------------------------------------------------------------------===//
+
+    /// Returns the number of times each region is executed.
+    unsigned getNumRegionInvocations(unsigned index) {
+      // Return max to indicate that the loop may execute indefinitely.
+      return std::numeric_limits<unsigned>::max();
+    }
+
+    /// Returns the successor regions based on the condition value.
+    void getEntrySuccessorRegions(Optional<unsigned> index,
+                                  ArrayRef<Attribute> operands,
+                                  SmallVectorImpl<RegionSuccessor> &regions) {
+      // If no region is specified, we start with the body region.
+      if (!index) {
+        regions.push_back(RegionSuccessor(&body(), /*operands=*/{}));
+        return;
+      }
+
+      // If the body region is specified, the next region depends on the condition.
+      if (*index == 0) {
+        // If condition is true, stay in the body. Otherwise, exit.
+        regions.push_back(RegionSuccessor(&body(), /*operands=*/{}));
+        regions.push_back(RegionSuccessor(/*successor=*/nullptr));
+      }
+    }
+
+    //===------------------------------------------------------------------===//
+    // OpAsmOpInterface Methods
+    //===------------------------------------------------------------------===//
+
+    /// EmitC ops in the body can omit their 'emitc.' prefix in the assembly.
+    static ::llvm::StringRef getDefaultDialect() {
+      return "emitc";
+    }
+  }];
+
+  let hasCustomAssemblyFormat = 1;
+  let hasVerifier = 1;
+}
+
 #endif // MLIR_DIALECT_EMITC_IR_EMITC
