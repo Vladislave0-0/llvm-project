@@ -1290,6 +1290,23 @@ void SwitchOp::getRegionInvocationBounds(
 }
 
 //===----------------------------------------------------------------------===//
+// WhileOp
+//===----------------------------------------------------------------------===//
+
+LogicalResult WhileOp::verify() {
+  // Check that the value type of condition type is `i1`
+
+  Type condTy = getCondition().getType();
+  auto lvalueTy = dyn_cast<emitc::LValueType>(condTy);
+
+  if (!lvalueTy.getValueType().isSignlessInteger(1))
+    return emitOpError() << "value type must be 'i1', but got "
+                         << lvalueTy.getValueType();
+
+  return success();
+}
+
+//===----------------------------------------------------------------------===//
 // TableGen'd op method definitions
 //===----------------------------------------------------------------------===//
 
