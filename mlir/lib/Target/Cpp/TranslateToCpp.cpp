@@ -500,6 +500,28 @@ static LogicalResult printOperation(CppEmitter &emitter,
   return success();
 }
 
+static LogicalResult printOperation(CppEmitter &emitter,
+                                    emitc::WhileOp whileOp) {
+  raw_indented_ostream &os = emitter.ostream();
+
+  os << "while (";
+  if (failed(emitter.emitOperand(whileOp.getCondition())))
+    return failure();
+  os << ") {\n";
+
+  os.indent();
+  Region &whileRegion = whileOp.getRegion();
+  auto regionOps = whileRegion.getOps();
+
+  for (auto it = regionOps.begin(); std::next(it) != regionOps.end(); ++it) {
+    if (failed(emitter.emitOperation(*it, /*trailingSemicolon=*/true)))
+      return failure();
+  }
+
+  os.unindent() << "}";
+  return success();
+}
+
 static LogicalResult printOperation(CppEmitter &emitter, emitc::CmpOp cmpOp) {
   Operation *operation = cmpOp.getOperation();
 
@@ -1564,8 +1586,8 @@ LogicalResult CppEmitter::emitOperation(Operation &op, bool trailingSemicolon) {
                 emitc::GlobalOp, emitc::IfOp, emitc::IncludeOp, emitc::LoadOp,
                 emitc::LogicalAndOp, emitc::LogicalNotOp, emitc::LogicalOrOp,
                 emitc::MulOp, emitc::RemOp, emitc::ReturnOp, emitc::SubOp,
-                emitc::SwitchOp, emitc::UnaryMinusOp, emitc::UnaryPlusOp,
-                emitc::VariableOp, emitc::VerbatimOp>(
+                emitc::SwitchOp, emitc::WhileOp, emitc::UnaryMinusOp,
+                emitc::UnaryPlusOp, emitc::VariableOp, emitc::VerbatimOp>(
               [&](auto op) { return printOperation(*this, op); })
           // Func ops.
           .Case<func::CallOp, func::FuncOp, func::ReturnOp>(
@@ -1609,7 +1631,8 @@ LogicalResult CppEmitter::emitOperation(Operation &op, bool trailingSemicolon) {
   // `}`.
   trailingSemicolon &=
       !isa<cf::CondBranchOp, emitc::DeclareFuncOp, emitc::ForOp, emitc::IfOp,
-           emitc::IncludeOp, emitc::SwitchOp, emitc::VerbatimOp>(op);
+           emitc::IncludeOp, emitc::SwitchOp, emitc::WhileOp,
+           emitc::VerbatimOp>(op);
 
   os << (trailingSemicolon ? ";\n" : "\n");
 
