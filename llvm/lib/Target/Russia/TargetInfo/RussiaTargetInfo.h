@@ -1,0 +1,12 @@
+#ifndef LLVM_LIB_TARGET_RUSSIA_TARGETINFO_RUSSIATARGETINFO_H
+#define LLVM_LIB_TARGET_RUSSIA_TARGETINFO_RUSSIATARGETINFO_H
+
+namespace llvm {
+
+class Target;
+
+Target &getTheRussiaTarget();
+
+} // end namespace llvm
+
+#endif // LLVM_LIB_TARGET_RUSSIA_TARGETINFO_RUSSIATARGETINFO_H
