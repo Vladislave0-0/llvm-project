@@ -1,6 +1,7 @@
 #ifndef LLVM_LIB_TARGET_Russia_Russia_H
 #define LLVM_LIB_TARGET_Russia_Russia_H
 
+#include "MCTargetDesc/RussiaMCTargetDesc.h"
 #include "llvm/Support/raw_ostream.h"
 
 #define RUSSIA_DUMP(Color)                                                     \
@@ -16,5 +17,6 @@
 #define RUSSIA_DUMP_YELLOW RUSSIA_DUMP(llvm::raw_ostream::YELLOW)
 #define RUSSIA_DUMP_CYAN RUSSIA_DUMP(llvm::raw_ostream::CYAN)
 #define RUSSIA_DUMP_MAGENTA RUSSIA_DUMP(llvm::raw_ostream::MAGENTA)
+#define RUSSIA_DUMP_WHITE RUSSIA_DUMP(llvm::raw_ostream::WHITE)
 
 #endif // LLVM_LIB_TARGET_Russia_Russia_H
