@@ -1,6 +1,7 @@
 #include "RussiaTargetMachine.h"
 #include "Russia.h"
 #include "TargetInfo/RussiaTargetInfo.h"
+#include "llvm/CodeGen/TargetPassConfig.h"
 #include "llvm/MC/TargetRegistry.h"
 #include <optional>
 
@@ -23,4 +24,25 @@ RussiaTargetMachine::RussiaTargetMachine(const Target &T, const Triple &TT,
           Reloc::Static, getEffectiveCodeModel(CM, CodeModel::Small), OL) {
   RUSSIA_DUMP_CYAN
   initAsmInfo();
+}
+
+namespace {
+
+/// Russia Code Generator Pass Configuration Options.
+class RussiaPassConfig : public TargetPassConfig {
+public:
+  RussiaPassConfig(RussiaTargetMachine &TM, PassManagerBase &PM)
+      : TargetPassConfig(TM, PM) {}
+
+  bool addInstSelector() override {
+    RUSSIA_DUMP_CYAN
+    return false;
+  }
+};
+
+} // end anonymous namespace
+
+TargetPassConfig *RussiaTargetMachine::createPassConfig(PassManagerBase &PM) {
+  RUSSIA_DUMP_CYAN
+  return new RussiaPassConfig(*this, PM);
 }
