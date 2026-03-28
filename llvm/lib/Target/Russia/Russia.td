@@ -1,4 +1,8 @@
 include "llvm/Target/Target.td"
 include "RussiaRegisterInfo.td"
+include "RussiaInstrInfo.td"
 
-def Russia : Target;
+def RussiaInstrInfo : InstrInfo;
+def Russia : Target {
+  let InstructionSet = RussiaInstrInfo;
+}

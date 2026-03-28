@@ -84,10 +84,11 @@ MCStreamer *createNullStreamer(MCContext &Ctx);
 ///
 /// \param ShowInst - Whether to show the MCInst representation inline with
 /// the assembly.
-MCStreamer *
-createAsmStreamer(MCContext &Ctx, std::unique_ptr<formatted_raw_ostream> OS,
-                  MCInstPrinter *InstPrint, std::unique_ptr<MCCodeEmitter> &&CE,
-                  std::unique_ptr<MCAsmBackend> &&TAB);
+MCStreamer *createAsmStreamer(MCContext &Ctx,
+                              std::unique_ptr<formatted_raw_ostream> OS,
+                              MCInstPrinter *InstPrint,
+                              std::unique_ptr<MCCodeEmitter> &&CE,
+                              std::unique_ptr<MCAsmBackend> &&TAB);
 
 MCStreamer *createELFStreamer(MCContext &Ctx,
                               std::unique_ptr<MCAsmBackend> &&TAB,
@@ -166,15 +167,17 @@ public:
   // If it weren't for layering issues (this header is in llvm/Support, but
   // depends on MC?) this should take the Streamer by value rather than rvalue
   // reference.
-  using AsmPrinterCtorTy = AsmPrinter *(*)(
-      TargetMachine &TM, std::unique_ptr<MCStreamer> &&Streamer);
+  using AsmPrinterCtorTy =
+      AsmPrinter *(*)(TargetMachine &TM,
+                      std::unique_ptr<MCStreamer> &&Streamer);
   using MCAsmBackendCtorTy = MCAsmBackend *(*)(const Target &T,
                                                const MCSubtargetInfo &STI,
                                                const MCRegisterInfo &MRI,
                                                const MCTargetOptions &Options);
-  using MCAsmParserCtorTy = MCTargetAsmParser *(*)(
-      const MCSubtargetInfo &STI, MCAsmParser &P, const MCInstrInfo &MII,
-      const MCTargetOptions &Options);
+  using MCAsmParserCtorTy =
+      MCTargetAsmParser *(*)(const MCSubtargetInfo &STI, MCAsmParser &P,
+                             const MCInstrInfo &MII,
+                             const MCTargetOptions &Options);
   using MCDisassemblerCtorTy = MCDisassembler *(*)(const Target &T,
                                                    const MCSubtargetInfo &STI,
                                                    MCContext &Ctx);
@@ -208,14 +211,15 @@ public:
   using AsmTargetStreamerCtorTy =
       MCTargetStreamer *(*)(MCStreamer &S, formatted_raw_ostream &OS,
                             MCInstPrinter *InstPrint);
-  using ObjectTargetStreamerCtorTy = MCTargetStreamer *(*)(
-      MCStreamer &S, const MCSubtargetInfo &STI);
+  using ObjectTargetStreamerCtorTy =
+      MCTargetStreamer *(*)(MCStreamer &S, const MCSubtargetInfo &STI);
   using MCRelocationInfoCtorTy = MCRelocationInfo *(*)(const Triple &TT,
                                                        MCContext &Ctx);
-  using MCSymbolizerCtorTy = MCSymbolizer *(*)(
-      const Triple &TT, LLVMOpInfoCallback GetOpInfo,
-      LLVMSymbolLookupCallback SymbolLookUp, void *DisInfo, MCContext *Ctx,
-      std::unique_ptr<MCRelocationInfo> &&RelInfo);
+  using MCSymbolizerCtorTy =
+      MCSymbolizer *(*)(const Triple &TT, LLVMOpInfoCallback GetOpInfo,
+                        LLVMSymbolLookupCallback SymbolLookUp, void *DisInfo,
+                        MCContext *Ctx,
+                        std::unique_ptr<MCRelocationInfo> &&RelInfo);
 
   using CustomBehaviourCtorTy =
       mca::CustomBehaviour *(*)(const MCSubtargetInfo &STI,

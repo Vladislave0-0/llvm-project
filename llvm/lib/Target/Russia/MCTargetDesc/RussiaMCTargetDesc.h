@@ -7,4 +7,8 @@
 #define GET_REGINFO_ENUM
 #include "RussiaGenRegisterInfo.inc"
 
+// Defines symbolic names for the Russia instructions.
+#define GET_INSTRINFO_ENUM
+#include "RussiaGenInstrInfo.inc"
+
 #endif // LLVM_LIB_TARGET_RUSSIA_MCTARGETDESC_RUSSIAMCTARGETDESC_H
