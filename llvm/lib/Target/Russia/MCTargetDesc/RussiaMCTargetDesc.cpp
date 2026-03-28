@@ -1,5 +1,6 @@
 #include "MCTargetDesc/RussiaInfo.h"
 #include "Russia.h"
+#include "RussiaInstPrinter.h"
 #include "RussiaMCAsmInfo.h"
 #include "TargetInfo/RussiaTargetInfo.h"
 #include "llvm/MC/MCDwarf.h"
@@ -41,14 +42,23 @@ createRussiaMCSubtargetInfo(const Triple &TT, StringRef CPU, StringRef FS) {
 }
 
 static MCAsmInfo *createRussiaMCAsmInfo(const MCRegisterInfo &MRI,
-                                     const Triple &TT,
-                                     const MCTargetOptions &Options) {
+                                        const Triple &TT,
+                                        const MCTargetOptions &Options) {
   RUSSIA_DUMP_MAGENTA
   MCAsmInfo *MAI = new RussiaELFMCAsmInfo(TT);
   unsigned SP = MRI.getDwarfRegNum(Russia::VODKA1, true);
   MCCFIInstruction Inst = MCCFIInstruction::cfiDefCfa(nullptr, SP, 0);
   MAI->addInitialFrameState(Inst);
   return MAI;
+}
+
+static MCInstPrinter *createRussiaMCInstPrinter(const Triple &T,
+                                                unsigned SyntaxVariant,
+                                                const MCAsmInfo &MAI,
+                                                const MCInstrInfo &MII,
+                                                const MCRegisterInfo &MRI) {
+  RUSSIA_DUMP_MAGENTA
+  return new RussiaInstPrinter(MAI, MII, MRI);
 }
 
 // We need to define this function for linking succeed
@@ -64,4 +74,6 @@ extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeRussiaTargetMC() {
   // Register the MC subtarget info.
   TargetRegistry::RegisterMCSubtargetInfo(TheRussiaTarget,
                                           createRussiaMCSubtargetInfo);
+  // Register the MCInstPrinter
+  TargetRegistry::RegisterMCInstPrinter(TheRussiaTarget, createRussiaMCInstPrinter);
 }
