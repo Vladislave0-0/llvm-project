@@ -7,6 +7,7 @@ tablegen(LLVM RussiaGenInstrInfo.inc -gen-instr-info)
 tablegen(LLVM RussiaGenSubtargetInfo.inc -gen-subtarget)
 tablegen(LLVM RussiaGenMCPseudoLowering.inc -gen-pseudo-lowering)
 tablegen(LLVM RussiaGenDAGISel.inc -gen-dag-isel)
+tablegen(LLVM RussiaGenCallingConv.inc -gen-callingconv)
 
 add_public_tablegen_target(RussiaCommonTableGen)
 
