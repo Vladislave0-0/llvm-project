@@ -22,6 +22,19 @@ enum NodeType : unsigned {
 
 } // namespace RussiaISD
 
+class RussiaTargetLowering : public TargetLowering {
+public:
+  explicit RussiaTargetLowering(const TargetMachine &TM, const RussiaSubtarget &STI);
+
+  /// This method returns the name of a target specific DAG node.
+  const char *getTargetNodeName(unsigned Opcode) const override;
+
+  RussiaSubtarget const &getSubtarget() const { return STI; }
+
+private:
+  const RussiaSubtarget &STI;
+};
+
 } // end namespace llvm
 
 #endif // LLVM_LIB_TARGET_RUSSIA_RUSSIAISELLOWERING_H

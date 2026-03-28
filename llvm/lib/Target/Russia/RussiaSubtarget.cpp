@@ -10,8 +10,8 @@ using namespace llvm;
 #define GET_SUBTARGETINFO_CTOR
 #include "RussiaGenSubtargetInfo.inc"
 
-RussiaSubtarget::RussiaSubtarget(const StringRef &CPU, const StringRef &TuneCPU,
-                           const StringRef &FS, const TargetMachine &TM)
-    : RussiaGenSubtargetInfo(TM.getTargetTriple(), CPU, TuneCPU, FS) {
+RussiaSubtarget::RussiaSubtarget(const Triple &TT, const std::string &CPU,
+                                 const std::string &FS, const TargetMachine &TM)
+    : RussiaGenSubtargetInfo(TT, CPU, /*TuneCPU=*/CPU, FS), TLInfo(TM, *this) {
   RUSSIA_DUMP_CYAN
 }
