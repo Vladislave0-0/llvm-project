@@ -3,6 +3,7 @@
 
 #include "MCTargetDesc/RussiaMCTargetDesc.h"
 #include "llvm/Support/raw_ostream.h"
+#include "llvm/Target/TargetMachine.h"
 
 #define RUSSIA_DUMP(Color)                                                     \
   {                                                                            \
@@ -18,5 +19,12 @@
 #define RUSSIA_DUMP_CYAN RUSSIA_DUMP(llvm::raw_ostream::CYAN)
 #define RUSSIA_DUMP_MAGENTA RUSSIA_DUMP(llvm::raw_ostream::MAGENTA)
 #define RUSSIA_DUMP_WHITE RUSSIA_DUMP(llvm::raw_ostream::WHITE)
+namespace llvm {
+class RussiaTargetMachine;
+class FunctionPass;
+
+FunctionPass *createRussiaISelDag(RussiaTargetMachine &TM, CodeGenOptLevel OptLevel);
+
+} // namespace llvm
 
 #endif // LLVM_LIB_TARGET_Russia_Russia_H

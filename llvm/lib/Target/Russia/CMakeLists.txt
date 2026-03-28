@@ -5,7 +5,8 @@ set(LLVM_TARGET_DEFINITIONS Russia.td)
 tablegen(LLVM RussiaGenRegisterInfo.inc -gen-register-info)
 tablegen(LLVM RussiaGenInstrInfo.inc -gen-instr-info)
 tablegen(LLVM RussiaGenSubtargetInfo.inc -gen-subtarget)
-tablegen(LLVM SimGenMCPseudoLowering.inc -gen-pseudo-lowering)
+tablegen(LLVM RussiaGenMCPseudoLowering.inc -gen-pseudo-lowering)
+tablegen(LLVM RussiaGenDAGISel.inc -gen-dag-isel)
 
 add_public_tablegen_target(RussiaCommonTableGen)
 
@@ -14,7 +15,8 @@ add_llvm_target(RussiaCodeGen
   RussiaRegisterInfo.cpp
   RussiaInstrInfo.cpp
   RussiaSubtarget.cpp
-  SimAsmPrinter.cpp
+  RussiaAsmPrinter.cpp
+  RussiaISelDagToDag.cpp
 
   LINK_COMPONENTS
   CodeGen
@@ -23,6 +25,7 @@ add_llvm_target(RussiaCodeGen
   Target
   RussiaInfo
   AsmPrinter
+  SelectionDAG
 
   ADD_TO_COMPONENT
   Russia

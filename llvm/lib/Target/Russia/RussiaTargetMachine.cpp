@@ -34,8 +34,13 @@ public:
   RussiaPassConfig(RussiaTargetMachine &TM, PassManagerBase &PM)
       : TargetPassConfig(TM, PM) {}
 
+  RussiaTargetMachine &getRussiaTargetMachine() const {
+    return getTM<RussiaTargetMachine>();
+  }
+
   bool addInstSelector() override {
     RUSSIA_DUMP_CYAN
+    addPass(createRussiaISelDag(getRussiaTargetMachine(), getOptLevel()));
     return false;
   }
 };
