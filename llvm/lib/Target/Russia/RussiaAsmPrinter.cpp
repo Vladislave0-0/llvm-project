@@ -28,7 +28,7 @@ class RussiaAsmPrinter : public AsmPrinter {
 
 public:
   explicit RussiaAsmPrinter(TargetMachine &TM,
-                         std::unique_ptr<MCStreamer> Streamer)
+                            std::unique_ptr<MCStreamer> Streamer)
       : AsmPrinter(TM, std::move(Streamer)), STI(TM.getMCSubtargetInfo()) {
     RUSSIA_DUMP_GREEN
   }
@@ -38,6 +38,11 @@ public:
   StringRef getPassName() const override { return "Russia Assembly Printer"; }
 
   bool lowerPseudoInstExpansion(const MachineInstr *MI, MCInst &Inst);
+
+  // Used in pseudo lowerings
+  bool lowerOperand(const MachineOperand &MO, MCOperand &MCOp) const {
+    return LowerRussiaMachineOperandToMCOperand(MO, MCOp, *this);
+  }
 };
 
 } // end anonymous namespace
@@ -53,6 +58,10 @@ void RussiaAsmPrinter::emitInstruction(const MachineInstr *MI) {
     EmitToStreamer(*OutStreamer, OutInst);
     return;
   }
+
+  MCInst TmpInst;
+  if (!lowerRussiaMachineInstrToMCInst(MI, TmpInst, *this))
+    EmitToStreamer(*OutStreamer, TmpInst);
 }
 
 // Force static initialization.

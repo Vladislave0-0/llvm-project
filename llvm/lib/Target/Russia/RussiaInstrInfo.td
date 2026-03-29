@@ -48,8 +48,8 @@ def PseudoRET : RussiaPseudoInst<(outs), (ins), "# PseudoRET",
                 [(russia_ret)]>,
                 PseudoInstExpansion<(BR VODKA7)>;
 
-// movli
+// movi
 let isAsCheapAsAMove = 1, isCodeGenOnly = 1, isReMaterializable = 1 in
-def MOVLI : RussiaInst<0x0, (outs GPR:$rd), (ins simm16:$imm),
-                     "MOVli $rd $imm",
+def MOVI : RussiaInst<0x0, (outs GPR:$rd), (ins simm16:$imm),
+                     "MOVi $rd $imm",
                      [(set GPR:$rd, simm16:$imm)]>;

@@ -22,6 +22,19 @@
 namespace llvm {
 class RussiaTargetMachine;
 class FunctionPass;
+class RussiaSubtarget;
+class AsmPrinter;
+class InstructionSelector;
+class MCInst;
+class MCOperand;
+class MachineInstr;
+class MachineOperand;
+class PassRegistry;
+
+bool lowerRussiaMachineInstrToMCInst(const MachineInstr *MI, MCInst &OutMI,
+                                  AsmPrinter &AP);
+bool LowerRussiaMachineOperandToMCOperand(const MachineOperand &MO,
+                                       MCOperand &MCOp, const AsmPrinter &AP);
 
 FunctionPass *createRussiaISelDag(RussiaTargetMachine &TM, CodeGenOptLevel OptLevel);
 

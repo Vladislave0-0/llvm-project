@@ -20,6 +20,7 @@ add_llvm_target(RussiaCodeGen
   RussiaAsmPrinter.cpp
   RussiaISelDagToDag.cpp
   RussiaISelLowering.cpp
+  RussiaMCInstLower.cpp
 
   LINK_COMPONENTS
   CodeGen
