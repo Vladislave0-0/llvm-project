@@ -4,7 +4,9 @@
 #include "Russia.h"
 #include "RussiaFrameLowering.h"
 #include "RussiaISelLowering.h"
+#include "RussiaInstrInfo.h"
 #include "RussiaRegisterInfo.h"
+#include "llvm/CodeGen/SelectionDAGTargetInfo.h"
 #include "llvm/CodeGen/TargetSubtargetInfo.h"
 
 #define GET_SUBTARGETINFO_HEADER
@@ -16,6 +18,8 @@ class RussiaSubtarget : public RussiaGenSubtargetInfo {
   RussiaTargetLowering TLInfo;
   RussiaFrameLowering FrameLowering;
   RussiaRegisterInfo RegInfo;
+  RussiaInstrInfo InstrInfo;
+  SelectionDAGTargetInfo TSInfo;
 
 public:
   RussiaSubtarget(const Triple &TT, const std::string &CPU,
@@ -37,6 +41,11 @@ public:
   const RussiaRegisterInfo *getRegisterInfo() const override {
     RUSSIA_DUMP_CYAN
     return &RegInfo;
+  }
+  const RussiaInstrInfo *getInstrInfo() const override { return &InstrInfo; }
+  const SelectionDAGTargetInfo *getSelectionDAGInfo() const override {
+    RUSSIA_DUMP_CYAN
+    return &TSInfo;
   }
 };
 
