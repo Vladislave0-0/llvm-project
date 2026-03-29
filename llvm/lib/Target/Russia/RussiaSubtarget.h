@@ -4,6 +4,7 @@
 #include "Russia.h"
 #include "RussiaFrameLowering.h"
 #include "RussiaISelLowering.h"
+#include "RussiaRegisterInfo.h"
 #include "llvm/CodeGen/TargetSubtargetInfo.h"
 
 #define GET_SUBTARGETINFO_HEADER
@@ -14,6 +15,7 @@ namespace llvm {
 class RussiaSubtarget : public RussiaGenSubtargetInfo {
   RussiaTargetLowering TLInfo;
   RussiaFrameLowering FrameLowering;
+  RussiaRegisterInfo RegInfo;
 
 public:
   RussiaSubtarget(const Triple &TT, const std::string &CPU,
@@ -30,6 +32,11 @@ public:
   const RussiaFrameLowering *getFrameLowering() const override {
     RUSSIA_DUMP_CYAN
     return &FrameLowering;
+  }
+
+  const RussiaRegisterInfo *getRegisterInfo() const override {
+    RUSSIA_DUMP_CYAN
+    return &RegInfo;
   }
 };
 
