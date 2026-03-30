@@ -492,7 +492,7 @@ set(LLVM_ALL_TARGETS
   NVPTX
   PowerPC
   RISCV
-  Russia
+  Rus
   Sparc
   SPIRV
   SystemZ
