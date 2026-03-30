@@ -1318,6 +1318,8 @@ StringRef ELFObjectFile<ELFT>::getFileFormatName() const {
       return "elf32-loongarch";
     case ELF::EM_XTENSA:
       return "elf32-xtensa";
+    case ELF::EM_RUS:
+       return "elf32-rus";
     default:
       return "elf32-unknown";
     }
