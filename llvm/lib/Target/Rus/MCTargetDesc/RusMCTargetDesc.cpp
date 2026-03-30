@@ -78,4 +78,6 @@ extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeRusTargetMC() {
   TargetRegistry::RegisterMCInstPrinter(TheRusTarget, createRusMCInstPrinter);
   // Register the MC Code Emitter.
   TargetRegistry::RegisterMCCodeEmitter(TheRusTarget, createRusMCCodeEmitter);
+  // Register the asm backend.
+  TargetRegistry::RegisterMCAsmBackend(TheRusTarget, createRusAsmBackend);
 }
