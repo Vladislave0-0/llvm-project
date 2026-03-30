@@ -51,8 +51,8 @@ public:
   static char ID;
 
   RusDAGToDAGISelLegacy(RusTargetMachine &TM, CodeGenOptLevel OptLevel)
-      : SelectionDAGISelLegacy(ID, std::make_unique<RusDAGToDAGISel>(
-                                       TM, OptLevel)){RUS_DUMP_RED}
+      : SelectionDAGISelLegacy(
+            ID, std::make_unique<RusDAGToDAGISel>(TM, OptLevel)){RUS_DUMP_RED}
 
         StringRef getPassName() const override {
     return "Rus DAG->DAG Pattern Instruction Selection";
@@ -65,7 +65,7 @@ char RusDAGToDAGISelLegacy::ID = 0;
 /// This pass converts a legalized DAG into a Rus-specific DAG, ready for
 /// instruction scheduling.
 FunctionPass *llvm::createRusISelDag(RusTargetMachine &TM,
-                                        CodeGenOptLevel OptLevel) {
+                                     CodeGenOptLevel OptLevel) {
   RUS_DUMP_RED
   return new RusDAGToDAGISelLegacy(TM, OptLevel);
 }

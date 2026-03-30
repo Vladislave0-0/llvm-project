@@ -8,7 +8,7 @@ namespace llvm {
 class RusInstPrinter : public MCInstPrinter {
 public:
   RusInstPrinter(const MCAsmInfo &MAI, const MCInstrInfo &MII,
-                    const MCRegisterInfo &MRI)
+                 const MCRegisterInfo &MRI)
       : MCInstPrinter(MAI, MII, MRI) {}
 
   std::pair<const char *, uint64_t>

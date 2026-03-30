@@ -28,7 +28,7 @@ class RusAsmPrinter : public AsmPrinter {
 
 public:
   explicit RusAsmPrinter(TargetMachine &TM,
-                            std::unique_ptr<MCStreamer> Streamer)
+                         std::unique_ptr<MCStreamer> Streamer)
       : AsmPrinter(TM, std::move(Streamer)), STI(TM.getMCSubtargetInfo()) {
     RUS_DUMP_GREEN
   }

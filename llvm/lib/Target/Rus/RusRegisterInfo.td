@@ -40,4 +40,3 @@ def GPR : RegisterClass<"Rus", [i32], 32, (add
   MATUSHKA,
   GOYDA
 )>;
-  

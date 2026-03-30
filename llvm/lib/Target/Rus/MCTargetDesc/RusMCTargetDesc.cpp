@@ -35,15 +35,15 @@ static MCInstrInfo *createRusMCInstrInfo() {
   return X;
 }
 
-static MCSubtargetInfo *
-createRusMCSubtargetInfo(const Triple &TT, StringRef CPU, StringRef FS) {
+static MCSubtargetInfo *createRusMCSubtargetInfo(const Triple &TT,
+                                                 StringRef CPU, StringRef FS) {
   RUS_DUMP_MAGENTA
   return createRusMCSubtargetInfoImpl(TT, CPU, /*TuneCPU*/ CPU, FS);
 }
 
 static MCAsmInfo *createRusMCAsmInfo(const MCRegisterInfo &MRI,
-                                        const Triple &TT,
-                                        const MCTargetOptions &Options) {
+                                     const Triple &TT,
+                                     const MCTargetOptions &Options) {
   RUS_DUMP_MAGENTA
   MCAsmInfo *MAI = new RusELFMCAsmInfo(TT);
   unsigned SP = MRI.getDwarfRegNum(Rus::ZAKROM, true);
@@ -53,10 +53,10 @@ static MCAsmInfo *createRusMCAsmInfo(const MCRegisterInfo &MRI,
 }
 
 static MCInstPrinter *createRusMCInstPrinter(const Triple &T,
-                                                unsigned SyntaxVariant,
-                                                const MCAsmInfo &MAI,
-                                                const MCInstrInfo &MII,
-                                                const MCRegisterInfo &MRI) {
+                                             unsigned SyntaxVariant,
+                                             const MCAsmInfo &MAI,
+                                             const MCInstrInfo &MII,
+                                             const MCRegisterInfo &MRI) {
   RUS_DUMP_MAGENTA
   return new RusInstPrinter(MAI, MII, MRI);
 }
@@ -67,8 +67,7 @@ extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeRusTargetMC() {
   Target &TheRusTarget = getTheRusTarget();
   RegisterMCAsmInfoFn X(TheRusTarget, createRusMCAsmInfo);
   // Register the MC register info.
-  TargetRegistry::RegisterMCRegInfo(TheRusTarget,
-                                    createRusMCRegisterInfo);
+  TargetRegistry::RegisterMCRegInfo(TheRusTarget, createRusMCRegisterInfo);
   // Register the MC instruction info.
   TargetRegistry::RegisterMCInstrInfo(TheRusTarget, createRusMCInstrInfo);
   // Register the MC subtarget info.

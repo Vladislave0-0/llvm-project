@@ -24,8 +24,7 @@ enum NodeType : unsigned {
 
 class RusTargetLowering : public TargetLowering {
 public:
-  explicit RusTargetLowering(const TargetMachine &TM,
-                                const RusSubtarget &STI);
+  explicit RusTargetLowering(const TargetMachine &TM, const RusSubtarget &STI);
 
   /// This method returns the name of a target specific DAG node.
   const char *getTargetNodeName(unsigned Opcode) const override;

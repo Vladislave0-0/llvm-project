@@ -22,14 +22,13 @@ void RusInstPrinter::printRegName(raw_ostream &O, MCRegister Reg) {
 }
 
 void RusInstPrinter::printInst(const MCInst *MI, uint64_t Address,
-                                  StringRef Annot, const MCSubtargetInfo &STI,
-                                  raw_ostream &O) {
+                               StringRef Annot, const MCSubtargetInfo &STI,
+                               raw_ostream &O) {
   printInstruction(MI, Address, O);
   printAnnotation(O, Annot);
 }
 
-void RusInstPrinter::printOperand(const MCInst *MI, int OpNo,
-                                     raw_ostream &O) {
+void RusInstPrinter::printOperand(const MCInst *MI, int OpNo, raw_ostream &O) {
   const MCOperand &MO = MI->getOperand(OpNo);
 
   if (MO.isReg()) {

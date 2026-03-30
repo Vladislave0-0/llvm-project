@@ -26,17 +26,17 @@
 
 using namespace llvm;
 
-static const MCPhysReg ArgGPRs[] = {Rus::GUSLI, Rus::BALALAIKA,
-                                    Rus::PLYAS, Rus::VODKA};
+static const MCPhysReg ArgGPRs[] = {Rus::GUSLI, Rus::BALALAIKA, Rus::PLYAS,
+                                    Rus::VODKA};
 
 void RusTargetLowering::ReplaceNodeResults(SDNode *N,
-                                              SmallVectorImpl<SDValue> &Results,
-                                              SelectionDAG &DAG) const {
+                                           SmallVectorImpl<SDValue> &Results,
+                                           SelectionDAG &DAG) const {
   llvm_unreachable("");
 }
 
 RusTargetLowering::RusTargetLowering(const TargetMachine &TM,
-                                           const RusSubtarget &STI)
+                                     const RusSubtarget &STI)
     : TargetLowering(TM), STI(STI) {
   RUS_DUMP_RED
   addRegisterClass(MVT::i32, &Rus::GPRRegClass);
@@ -89,9 +89,8 @@ static Align getPrefTypeAlign(EVT VT, SelectionDAG &DAG) {
       VT.getTypeForEVT(*DAG.getContext()));
 }
 
-SDValue
-RusTargetLowering::LowerCall(TargetLowering::CallLoweringInfo &CLI,
-                                SmallVectorImpl<SDValue> &InVals) const {
+SDValue RusTargetLowering::LowerCall(TargetLowering::CallLoweringInfo &CLI,
+                                     SmallVectorImpl<SDValue> &InVals) const {
   RUS_DUMP_RED
   SelectionDAG &DAG = CLI.DAG;
   SDLoc &DL = CLI.DL;
@@ -526,10 +525,10 @@ bool RusTargetLowering::CanLowerReturn(
 
 SDValue
 RusTargetLowering::LowerReturn(SDValue Chain, CallingConv::ID CallConv,
-                                  bool IsVarArg,
-                                  const SmallVectorImpl<ISD::OutputArg> &Outs,
-                                  const SmallVectorImpl<SDValue> &OutVals,
-                                  const SDLoc &DL, SelectionDAG &DAG) const {
+                               bool IsVarArg,
+                               const SmallVectorImpl<ISD::OutputArg> &Outs,
+                               const SmallVectorImpl<SDValue> &OutVals,
+                               const SDLoc &DL, SelectionDAG &DAG) const {
   RUS_DUMP_RED
   const MachineFunction &MF = DAG.getMachineFunction();
   const RusSubtarget &STI = MF.getSubtarget<RusSubtarget>();
@@ -573,7 +572,7 @@ RusTargetLowering::LowerReturn(SDValue Chain, CallingConv::ID CallConv,
 //===----------------------------------------------------------------------===//
 
 SDValue RusTargetLowering::PerformDAGCombine(SDNode *N,
-                                                DAGCombinerInfo &DCI) const {
+                                             DAGCombinerInfo &DCI) const {
   return {};
 }
 
@@ -584,9 +583,9 @@ SDValue RusTargetLowering::PerformDAGCombine(SDNode *N,
 /// Return true if the addressing mode represented by AM is legal for this
 /// target, for a load/store of the specified type.
 bool RusTargetLowering::isLegalAddressingMode(const DataLayout &DL,
-                                                 const AddrMode &AM, Type *Ty,
-                                                 unsigned AS,
-                                                 Instruction *I) const {
+                                              const AddrMode &AM, Type *Ty,
+                                              unsigned AS,
+                                              Instruction *I) const {
   RUS_DUMP_RED
   // No global is ever allowed as a base.
   if (AM.BaseGV)

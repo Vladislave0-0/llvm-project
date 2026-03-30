@@ -14,10 +14,10 @@ class RusTargetMachine : public CodeGenTargetMachineImpl {
 
 public:
   RusTargetMachine(const Target &T, const Triple &TT, StringRef CPU,
-                      StringRef FS, const TargetOptions &Options,
-                      std::optional<Reloc::Model> RM,
-                      std::optional<CodeModel::Model> CM, CodeGenOptLevel OL,
-                      bool JIT);
+                   StringRef FS, const TargetOptions &Options,
+                   std::optional<Reloc::Model> RM,
+                   std::optional<CodeModel::Model> CM, CodeGenOptLevel OL,
+                   bool JIT);
 
   const RusSubtarget *getSubtargetImpl(const Function &) const override {
     RUS_DUMP_CYAN

@@ -1,8 +1,8 @@
 #ifndef LLVM_LIB_TARGET_RUS_RUSINSTRINFO_H
 #define LLVM_LIB_TARGET_RUS_RUSINSTRINFO_H
 
-#include "RusRegisterInfo.h"
 #include "MCTargetDesc/RusInfo.h"
+#include "RusRegisterInfo.h"
 #include "llvm/CodeGen/TargetInstrInfo.h"
 
 #define GET_INSTRINFO_HEADER
@@ -15,7 +15,6 @@ class RusSubtarget;
 class RusInstrInfo : public RusGenInstrInfo {
 public:
   RusInstrInfo();
-
 };
 
 } // end namespace llvm

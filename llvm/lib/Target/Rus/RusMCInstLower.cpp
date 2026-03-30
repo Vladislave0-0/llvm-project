@@ -28,8 +28,8 @@ static MCOperand lowerSymbolOperand(const MachineOperand &MO, MCSymbol *Sym,
 }
 
 bool llvm::LowerRusMachineOperandToMCOperand(const MachineOperand &MO,
-                                                MCOperand &MCOp,
-                                                const AsmPrinter &AP) {
+                                             MCOperand &MCOp,
+                                             const AsmPrinter &AP) {
   switch (MO.getType()) {
   default:
     report_fatal_error("LowerRusMachineInstrToMCInst: unknown operand type");
@@ -69,8 +69,8 @@ bool llvm::LowerRusMachineOperandToMCOperand(const MachineOperand &MO,
   return true;
 }
 
-bool llvm::lowerRusMachineInstrToMCInst(const MachineInstr *MI,
-                                           MCInst &OutMI, AsmPrinter &AP) {
+bool llvm::lowerRusMachineInstrToMCInst(const MachineInstr *MI, MCInst &OutMI,
+                                        AsmPrinter &AP) {
   RUS_DUMP_RED
   OutMI.setOpcode(MI->getOpcode());
 
