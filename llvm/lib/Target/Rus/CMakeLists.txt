@@ -9,6 +9,7 @@ tablegen(LLVM RusGenMCPseudoLowering.inc -gen-pseudo-lowering)
 tablegen(LLVM RusGenDAGISel.inc -gen-dag-isel)
 tablegen(LLVM RusGenCallingConv.inc -gen-callingconv)
 tablegen(LLVM RusGenAsmWriter.inc -gen-asm-writer)
+tablegen(LLVM RusGenMCCodeEmitter.inc -gen-emitter)
 
 add_public_tablegen_target(RusCommonTableGen)
 

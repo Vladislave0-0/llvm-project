@@ -7,6 +7,15 @@
 #define GET_REGINFO_ENUM
 #include "RusGenRegisterInfo.inc"
 
+namespace llvm {
+class MCCodeEmitter;
+class MCContext;
+class MCInstrInfo;
+
+MCCodeEmitter *createRusMCCodeEmitter(const MCInstrInfo &MCII, MCContext &Ctx);
+} // namespace llvm
+
+
 // Defines symbolic names for the Rus instructions.
 #define GET_INSTRINFO_ENUM
 #include "RusGenInstrInfo.inc"

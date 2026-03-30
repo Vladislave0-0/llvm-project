@@ -2,6 +2,7 @@ add_llvm_component_library(LLVMRusDesc
   RusMCTargetDesc.cpp
   RusMCAsmInfo.cpp
   RusInstPrinter.cpp
+  RusMCCodeEmitter.cpp
 
   LINK_COMPONENTS
   MC
