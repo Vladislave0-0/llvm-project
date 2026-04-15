@@ -1,5 +1,5 @@
-BUILTIN(rusPutPixel, "vUiUiUi", "nc")
-BUILTIN(rusFlush, "v", "nc")
-BUILTIN(rusRand, "Ui", "n")
+BUILTIN(simPutPixel, "vUiUiUi", "nc")
+BUILTIN(simFlush, "v", "nc")
+BUILTIN(simRand, "Ui", "n")
 
 #undef BUILTIN
