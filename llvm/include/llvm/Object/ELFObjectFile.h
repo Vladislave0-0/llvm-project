@@ -1411,6 +1411,9 @@ template <class ELFT> Triple::ArchType ELFObjectFile<ELFT>::getArch() const {
   case ELF::EM_SPARCV9:
     return Triple::sparcv9;
 
+  case ELF::EM_RUS:
+     return Triple::rus;
+
   case ELF::EM_AMDGPU: {
     if (!IsLittleEndian)
       return Triple::UnknownArch;

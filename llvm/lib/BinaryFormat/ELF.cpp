@@ -554,6 +554,8 @@ StringRef ELF::convertEMachineToArchName(uint16_t EMachine) {
     return "amdgpu";
   case EM_RISCV:
     return "riscv";
+  case EM_RUS:
+    return "rus";
   case EM_LANAI:
     return "lanai";
   case EM_BPF:
