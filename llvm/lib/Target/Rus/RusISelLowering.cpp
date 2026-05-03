@@ -591,7 +591,7 @@ bool RusTargetLowering::isLegalAddressingMode(const DataLayout &DL,
   if (AM.BaseGV)
     return false;
 
-  if (!isInt<16>(AM.BaseOffs))
+  if (!isInt<32>(AM.BaseOffs))
     return false;
 
   switch (AM.Scale) {

@@ -21,17 +21,17 @@ class SImmAsmOperand<int width> : AsmOperandClass {
   let DiagnosticType = !strconcat("Invalid", Name);
 }
 
-def simm16 : Operand<i32>, ImmLeaf<i32, [{return isInt<16>(Imm);}]> {
-  let ParserMatchClass = SImmAsmOperand<16>;
-  let EncoderMethod = "getSImm16OpValue";
-  let DecoderMethod = "decodeSImmOperand<16>";
+def simm32 : Operand<i32>, ImmLeaf<i32, [{return isInt<32>(Imm);}]> {
+  let ParserMatchClass = SImmAsmOperand<32>;
+  let EncoderMethod = "getSImm32OpValue";
+  let DecoderMethod = "decodeSImmOperand<32>";
   let MCOperandPredicate = [{
     int64_t Imm;
     if (MCOp.evaluateAsConstantImm(Imm))
-      return isInt<16>(Imm);
+      return isInt<32>(Imm);
     return MCOp.isBareSymbolRef();
   }];
-  let OperandType = "OPERAND_SIMM16";
+  let OperandType = "OPERAND_SIMM32";
   let OperandNamespace = "RusOp";
 }
 
@@ -48,11 +48,11 @@ def PseudoRET : RusPseudoInst<(outs), (ins), "# PseudoRET",
                 [(rus_ret)]>,
                 PseudoInstExpansion<(BR LESHY)>;
 
-// movi
+// movli
 let isAsCheapAsAMove = 1, isCodeGenOnly = 1, isReMaterializable = 1, r2 = 0 in
-def MOVI : RusInst<0xAA, (outs GPR:$r1), (ins simm16:$r3_imm),
-                   "MOVi $r1 $r3_imm",
-                   [(set GPR:$r1, simm16:$r3_imm)]>;
+def MOVLI : RusInst<0xAA, (outs GPR:$r1), (ins simm32:$r3_imm),
+                   "MOVli $r1 $r3_imm",
+                   [(set GPR:$r1, simm32:$r3_imm)]>;
 
 // flush
 let r1 = 0, r2 = 0, r3_imm = 0 in

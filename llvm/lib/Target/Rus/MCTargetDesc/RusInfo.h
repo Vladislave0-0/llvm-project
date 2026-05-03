@@ -8,6 +8,7 @@ namespace llvm {
 namespace RusOp {
 enum OperandType : unsigned {
   OPERAND_SIMM16 = MCOI::OPERAND_FIRST_TARGET,
+  OPERAND_SIMM32,
 };
 } // namespace RusOp
 

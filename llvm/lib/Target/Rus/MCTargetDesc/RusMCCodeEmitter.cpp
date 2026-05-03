@@ -54,7 +54,7 @@ public:
   unsigned getMachineOpValue(const MCInst &MI, const MCOperand &MO,
                              SmallVectorImpl<MCFixup> &Fixups,
                              const MCSubtargetInfo &STI) const;
-  unsigned getSImm16OpValue(const MCInst &MI, unsigned OpNo,
+  unsigned getSImm32OpValue(const MCInst &MI, unsigned OpNo,
                             SmallVectorImpl<MCFixup> &Fixups,
                             const MCSubtargetInfo &STI) const;
 };
@@ -65,7 +65,7 @@ void RusMCCodeEmitter::encodeInstruction(const MCInst &MI,
                                          SmallVectorImpl<char> &CB,
                                          SmallVectorImpl<MCFixup> &Fixups,
                                          const MCSubtargetInfo &STI) const {
-  unsigned Bits = getBinaryCodeForInstr(MI, Fixups, STI);
+  uint64_t Bits = getBinaryCodeForInstr(MI, Fixups, STI);
   support::endian::write(CB, Bits, llvm::endianness::little);
 
   ++MCNumEmitted; // Keep track of the # of mi's emitted.
@@ -92,7 +92,7 @@ unsigned RusMCCodeEmitter::getMachineOpValue(const MCInst &MI,
   return 0;
 }
 
-unsigned RusMCCodeEmitter::getSImm16OpValue(const MCInst &MI, unsigned OpNo,
+unsigned RusMCCodeEmitter::getSImm32OpValue(const MCInst &MI, unsigned OpNo,
                                             SmallVectorImpl<MCFixup> &Fixups,
                                             const MCSubtargetInfo &STI) const {
   const MCOperand &MO = MI.getOperand(OpNo);
@@ -100,7 +100,7 @@ unsigned RusMCCodeEmitter::getSImm16OpValue(const MCInst &MI, unsigned OpNo,
     return MO.getImm();
 
   assert(MO.isExpr() &&
-         "getSImm16OpValue expects only expressions or an immediate");
+         "getSImm32OpValue expects only expressions or an immediate");
 
   const MCExpr *Expr = MO.getExpr();
 
