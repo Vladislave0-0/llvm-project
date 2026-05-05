@@ -38,6 +38,12 @@ void RusFrameLowering::emitEpilogue(MachineFunction &MF,
       .addImm(FrameSize);
 }
 
+MachineBasicBlock::iterator RusFrameLowering::eliminateCallFramePseudoInstr(
+    MachineFunction &, MachineBasicBlock &MBB,
+    MachineBasicBlock::iterator MI) const {
+  return MBB.erase(MI);
+}
+
 StackOffset RusFrameLowering::getFrameIndexReference(const MachineFunction &MF,
                                                      int FI,
                                                      Register &FrameReg) const {

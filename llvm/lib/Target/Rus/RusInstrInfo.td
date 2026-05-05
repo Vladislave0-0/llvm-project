@@ -10,6 +10,18 @@ def SDT_RusBrCC : SDTypeProfile<0, 2, [SDTCisVT<0, i32>,
 def rus_brcc    : SDNode<"RusISD::BR_CC", SDT_RusBrCC,
                             [SDNPHasChain]>;
 
+def SDT_CallSeqStart : SDCallSeqStart<[SDTCisVT<0, i32>, SDTCisVT<1, i32>]>;
+def SDT_CallSeqEnd   : SDCallSeqEnd<[SDTCisVT<0, i32>, SDTCisVT<1, i32>]>;
+
+def callseq_start : SDNode<"ISD::CALLSEQ_START", SDT_CallSeqStart,
+                            [SDNPHasChain, SDNPOutGlue]>;
+def callseq_end   : SDNode<"ISD::CALLSEQ_END",   SDT_CallSeqEnd,
+                            [SDNPHasChain, SDNPOptInGlue, SDNPOutGlue]>;
+
+def SDT_RusCall : SDTypeProfile<0, 1, [SDTCisVT<0, i32>]>;
+def Rus_call    : SDNode<"RusISD::CALL", SDT_RusCall,
+                              [SDNPHasChain, SDNPOptInGlue, SDNPVariadic]>;
+
 //===----------------------------------------------------------------------===//
 // Instruction format superclass
 //===----------------------------------------------------------------------===//
@@ -75,6 +87,16 @@ let isBarrier = 1, isReturn = 1, isTerminator = 1 in
 def PseudoRET : RusPseudoInst<(outs), (ins), "# PseudoRET",
                 [(rus_ret)]>,
                 PseudoInstExpansion<(BR LESHY)>;
+
+let Defs = [ZAKROM], Uses = [ZAKROM] in {
+def ADJCALLSTACKDOWN : RusPseudoInst<(outs), (ins i32imm:$amt1, i32imm:$amt2),
+    "# ADJCALLSTACKDOWN $amt1, $amt2",
+    [(callseq_start timm:$amt1, timm:$amt2)]>;
+
+def ADJCALLSTACKUP : RusPseudoInst<(outs), (ins i32imm:$amt1, i32imm:$amt2),
+    "# ADJCALLSTACKUP $amt1, $amt2",
+    [(callseq_end timm:$amt1, timm:$amt2)]>;
+}
 
 // ADDi
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
@@ -191,3 +213,9 @@ def SW : RusInst<0x11, (outs), (ins GPR:$r1, GPR:$r2, simm32:$r3_imm),
 // Patterns for LW and SW
 def : Pat<(i32 (load GPR:$r2)), (LW GPR:$r2, 0)>;
 def : Pat<(store (i32 GPR:$r1), GPR:$r2), (SW GPR:$r1, GPR:$r2, 0)>;
+
+// CALL
+let isCall = 1, hasSideEffects = 1, mayLoad = 1, mayStore = 1, r1 = 0, r2 = 0 in
+def CALL : RusInst<0x92, (outs), (ins btarget32:$func),
+           "CALL $func", []>;
+

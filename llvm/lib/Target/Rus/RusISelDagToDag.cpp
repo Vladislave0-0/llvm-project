@@ -173,6 +173,34 @@ void RusDAGToDAGISel::Select(SDNode *Node) {
     return;
   }
 
+  case RusISD::CALL: {
+    SDValue Chain = Node->getOperand(0);
+    SDValue Callee = Node->getOperand(1);
+
+    if (auto *ES = dyn_cast<ExternalSymbolSDNode>(Callee))
+      Callee = CurDAG->getTargetExternalSymbol(ES->getSymbol(), MVT::i32);
+
+    SmallVector<SDValue, 8> Ops;
+    Ops.push_back(Callee);
+
+    unsigned N = Node->getNumOperands();
+    bool HasGlue = Node->getOperand(N - 1).getValueType() == MVT::Glue;
+    unsigned GlueIdx = HasGlue ? N - 1 : N;
+
+    for (unsigned i = 2; i < GlueIdx; ++i)
+      Ops.push_back(Node->getOperand(i));
+    
+    Ops.push_back(Chain);
+    if (HasGlue)
+      Ops.push_back(Node->getOperand(GlueIdx));
+
+    SDNode *CallNode =
+        CurDAG->getMachineNode(Rus::CALL, DL, Node->getVTList(), Ops);
+    ReplaceNode(Node, CallNode);
+
+    return;
+  }
+
   default:
     break;
   }
