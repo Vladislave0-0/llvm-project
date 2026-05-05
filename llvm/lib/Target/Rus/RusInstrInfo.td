@@ -76,11 +76,11 @@ def PseudoRET : RusPseudoInst<(outs), (ins), "# PseudoRET",
                 [(rus_ret)]>,
                 PseudoInstExpansion<(BR LESHY)>;
 
-// movli
+// movi
 let isAsCheapAsAMove = 1, isCodeGenOnly = 1, isReMaterializable = 1, r2 = 0 in
-def MOVLI : RusInst<0xAA, (outs GPR:$r1), (ins simm32:$r3_imm),
-                   "MOVli $r1 $r3_imm",
-                   [(set GPR:$r1, simm32:$r3_imm)]>;
+def MOVI : RusInst<0xAA, (outs GPR:$r1), (ins simm32:$r3_imm),
+                  "MOVi $r1 $r3_imm",
+                  [(set GPR:$r1, simm32:$r3_imm)]>;
 
 // flush
 let r1 = 0, r2 = 0, r3_imm = 0 in
