@@ -53,7 +53,7 @@ bool RusRegisterInfo::eliminateFrameIndex(MachineBasicBlock::iterator II,
                    .getFixed();
   Offset += MI.getOperand(FIOperandNum + 1).getImm();
 
-  if (!isInt<16>(Offset)) {
+  if (!isInt<32>(Offset)) {
     llvm_unreachable("");
   }
 

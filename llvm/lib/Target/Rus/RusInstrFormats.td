@@ -3,11 +3,13 @@
 //
 //  CPU INSTRUCTION FORMATS
 //
-//  FF FF FF FF
-//        ^^ ^^ - r3_imm - third reg or imm
-//      ^       - r2     - second reg
-//     ^        - r1     - first reg
-//  ^^          - opcode - operation code
+//  FF F F 0000 FFFFFFFF
+//  ^  ^ ^    ^        ^
+//  |  | |    |        +-- [31:0]  r3_imm  - third reg or 32-bit immediate
+//  |  | |    +----------- [47:32] padding - reserved (zeros)
+//  |  | +---------------- [51:48] r2      - second register (4 bits)
+//  |  +------------------ [55:52] r1      - first register (4 bits)
+//  +--------------------- [63:56] opcode  - operation code (8 bits)
 //
 //===----------------------------------------------------------------------===//
 
@@ -18,19 +20,20 @@ class RusInst<bits<8> op, dag outs, dag ins, string asmstr, list<dag> pattern>: 
   // tablegen(... -gen-disassembler) in CMakeLists.txt
   let Namespace = "Rus";
   let DecoderNamespace = "Rus";
-  let Size = 4;
+  let Size = 8;
 
-  field bits<32> Inst;
+  field bits<64> Inst;
 
-  bits<8> Opcode = op;
+  bits<8>  Opcode = op;
   bits<4>  r1;
   bits<4>  r2;
-  bits<16> r3_imm;
+  bits<32> r3_imm;
 
-  let Inst{31-24} = Opcode;
-  let Inst{23-20} = r1;
-  let Inst{19-16} = r2;
-  let Inst{15-0}  = r3_imm;
+  let Inst{63-56} = Opcode;
+  let Inst{55-52} = r1;
+  let Inst{51-48} = r2;
+  let Inst{47-32} = 0;
+  let Inst{31-0}  = r3_imm;
 
   let OutOperandList = outs;
   let InOperandList  = ins;
