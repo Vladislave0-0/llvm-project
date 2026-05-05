@@ -5,9 +5,9 @@
 def rus_ret     : SDNode<"RusISD::RET", SDTNone,
                             [SDNPHasChain, SDNPOptInGlue, SDNPVariadic]>;
 
-def SDT_rusBrCC : SDTypeProfile<0, 2, [SDTCisVT<0, i32>,
+def SDT_RusBrCC : SDTypeProfile<0, 2, [SDTCisVT<0, i32>,
                                         SDTCisVT<1, OtherVT>]>;
-def rus_brcc    : SDNode<"RusISD::BR_CC", SDT_rusBrCC,
+def rus_brcc    : SDNode<"RusISD::BR_CC", SDT_RusBrCC,
                             [SDNPHasChain]>;
 
 //===----------------------------------------------------------------------===//
@@ -135,8 +135,10 @@ def SREMi : RusInst<0x89, (outs GPR:$r1), (ins GPR:$r2, simm32:$r3_imm),
            "SREMi $r1 $r2 $r3_imm",
            [(set GPR:$r1, (srem GPR:$r2, simm32:$r3_imm))]>;
 
-let Constraints = "$r2 = $rs_out", hasSideEffects = 1, mayLoad = 0, mayStore = 0 in
-def INC_EQ : RusInst<0x90, (outs GPR:$r1, GPR:$rs_out), (ins GPR:$r2, simm32:$r3_imm), "INC_EQ $r1 $r2 $r3_imm", []>;
+// INC_EQ
+let Constraints = "$r2_tmp = $r2", hasSideEffects = 1, mayLoad = 0, mayStore = 0 in
+def INC_EQ : RusInst<0x90, (outs GPR:$r1, GPR:$r2_tmp), (ins GPR:$r2, simm32:$r3_imm), 
+             "INC_EQ $r1 $r2 $r3_imm", []>;
 
 // FLUSH
 let r1 = 0, r2 = 0, r3_imm = 0 in
