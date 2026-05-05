@@ -2,8 +2,13 @@
 // Rus profiles and nodes
 //===----------------------------------------------------------------------===//
 
-def rus_ret      : SDNode<"RusISD::RET", SDTNone,
+def rus_ret     : SDNode<"RusISD::RET", SDTNone,
                             [SDNPHasChain, SDNPOptInGlue, SDNPVariadic]>;
+
+def SDT_rusBrCC : SDTypeProfile<0, 2, [SDTCisVT<0, i32>,
+                                        SDTCisVT<1, OtherVT>]>;
+def rus_brcc    : SDNode<"RusISD::BR_CC", SDT_rusBrCC,
+                            [SDNPHasChain]>;
 
 //===----------------------------------------------------------------------===//
 // Instruction format superclass
@@ -35,9 +40,32 @@ def simm32 : Operand<i32>, ImmLeaf<i32, [{return isInt<32>(Imm);}]> {
   let OperandNamespace = "RusOp";
 }
 
+def btarget32 : Operand<OtherVT> {
+  let ParserMatchClass = SImmAsmOperand<32>;
+  let PrintMethod = "printBranchOperand";
+  let EncoderMethod = "getBranchTarget32OpValue";
+  let DecoderMethod = "decodeSImmOperand<32>";
+  let MCOperandPredicate = [{
+    int64_t Imm;
+    if (MCOp.evaluateAsConstantImm(Imm))
+      return isInt<32>(Imm);
+    return MCOp.isBareSymbolRef();
+  }];
+  let OperandType = "OPERAND_PCREL";
+}
+
 //===----------------------------------------------------------------------===//
 // Rus Instructions
 //===----------------------------------------------------------------------===//
+
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0, isBarrier = 1, isBranch = 1, isTerminator = 1, r1 = 0, r2 = 0 in
+def B : RusInst<0xB0, (outs), (ins btarget32:$r3_imm), "B $r3_imm",
+                [(br bb:$r3_imm)]>;
+
+let isBranch = 1, isTerminator = 1, r2 = 0 in
+def BR_COND : RusInst<0xBC, (outs), (ins GPR:$r1, btarget32:$r3_imm),
+                      "BR_COND $r1 $r3_imm",
+                      [(rus_brcc GPR:$r1, bb:$r3_imm)]>;
 
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0, isCall = 1, isBranch = 1, isTerminator = 1, r2 = 0, r3_imm = 0 in
 def BR : RusInst<0xBB, (outs), (ins GPR:$r1), "BR $r1",

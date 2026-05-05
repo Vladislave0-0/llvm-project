@@ -58,6 +58,7 @@ RusTargetLowering::RusTargetLowering(const TargetMachine &TM,
   setOperationAction(ISD::Constant, MVT::i32, Legal);
   setOperationAction(ISD::UNDEF, MVT::i32, Legal);
 
+  setOperationAction(ISD::BR, MVT::Other, Legal);
   setOperationAction(ISD::BR_CC, MVT::i32, Custom);
 
   setOperationAction(ISD::FRAMEADDR, MVT::i32, Legal);
@@ -70,8 +71,31 @@ const char *RusTargetLowering::getTargetNodeName(unsigned Opcode) const {
     return "RusISD::CALL";
   case RusISD::RET:
     return "RusISD::RET";
+  case RusISD::BR_CC:
+    return "RusISD::BR_CC";
   }
   return nullptr;
+}
+
+SDValue RusTargetLowering::LowerOperation(SDValue Op, SelectionDAG &DAG) const {
+  switch (Op->getOpcode()) {
+  case ISD::BR_CC:
+    return lowerBR_CC(Op, DAG);
+  default:
+    llvm_unreachable("Unimplemented custom lowering");
+  }
+}
+
+SDValue RusTargetLowering::lowerBR_CC(SDValue Op, SelectionDAG &DAG) const {
+  SDLoc DL(Op);
+  SDValue Chain = Op.getOperand(0);
+  ISD::CondCode CCVal = cast<CondCodeSDNode>(Op.getOperand(1))->get();
+  SDValue LHS = Op.getOperand(2);
+  SDValue RHS = Op.getOperand(3);
+  SDValue Dest = Op.getOperand(4);
+
+  SDValue Cond = DAG.getSetCC(DL, MVT::i32, LHS, RHS, CCVal);
+  return DAG.getNode(RusISD::BR_CC, DL, MVT::Other, Chain, Cond, Dest);
 }
 
 //===----------------------------------------------------------------------===//
