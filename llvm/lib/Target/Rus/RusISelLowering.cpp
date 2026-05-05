@@ -32,7 +32,7 @@ static const MCPhysReg ArgGPRs[] = {Rus::GUSLI, Rus::BALALAIKA, Rus::PLYAS,
 void RusTargetLowering::ReplaceNodeResults(SDNode *N,
                                            SmallVectorImpl<SDValue> &Results,
                                            SelectionDAG &DAG) const {
-  llvm_unreachable("");
+  // llvm_unreachable("");
 }
 
 RusTargetLowering::RusTargetLowering(const TargetMachine &TM,
@@ -63,6 +63,10 @@ RusTargetLowering::RusTargetLowering(const TargetMachine &TM,
   setOperationAction(ISD::UNDEF, MVT::i32, Legal);
 
   setOperationAction(ISD::SETCC, MVT::i32, Legal);
+  setOperationAction(ISD::SELECT, MVT::i1, Expand);
+  setOperationAction(ISD::SELECT_CC, MVT::i1, Legal);
+  setOperationAction(ISD::SELECT, MVT::i32, Expand);
+  setOperationAction(ISD::SELECT_CC, MVT::i32, Legal);
 
   setOperationAction(ISD::BR, MVT::Other, Legal);
   setOperationAction(ISD::BR_CC, MVT::i32, Custom);

@@ -27,7 +27,7 @@ class RusInst<bits<8> op, dag outs, dag ins, string asmstr, list<dag> pattern>: 
   bits<8>  Opcode = op;
   bits<4>  r1;
   bits<4>  r2;
-  bits<32> r3_imm;
+  bits<32> r3_imm = 0;
 
   let Inst{63-56} = Opcode;
   let Inst{55-52} = r1;
@@ -39,7 +39,6 @@ class RusInst<bits<8> op, dag outs, dag ins, string asmstr, list<dag> pattern>: 
   let InOperandList  = ins;
   let AsmString   = asmstr;
   let Pattern     = pattern;
-
 }
 
 // Pseudo instructions format

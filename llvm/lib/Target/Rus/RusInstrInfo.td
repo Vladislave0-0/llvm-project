@@ -170,6 +170,12 @@ def CMP_GE  : RusInst<0x0B, (outs GPR:$r1), (ins GPR:$r2, GPR:$r3_imm),
                 [(set GPR:$r1, (setge  GPR:$r2, GPR:$r3_imm))]>;
 }
 
+// SELECT
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
+def SELECT : RusInst<0x91, (outs GPR:$r1), (ins GPR:$r2, simm32:$imm1, simm32:$imm2, simm32:$imm3),
+    "SELECT $r1 $r2 $imm1 $imm2 $imm3",
+    [(set GPR:$r1, (selectcc GPR:$r2, simm32:$imm1, simm32:$imm2, simm32:$imm3, SETEQ))]>;
+
 // Load Word
 let mayLoad = 1, hasSideEffects = 0 in
 def LW : RusInst<0x10, (outs GPR:$r1), (ins GPR:$r2, simm32:$r3_imm),

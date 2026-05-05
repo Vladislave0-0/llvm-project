@@ -29,3 +29,29 @@ void RusInstrInfo::copyPhysReg(MachineBasicBlock &MBB,
 
   llvm_unreachable("can't copyPhysReg");
 }
+
+void RusInstrInfo::storeRegToStackSlot(
+    MachineBasicBlock &MBB, MachineBasicBlock::iterator MI, Register SrcReg,
+    bool IsKill, int FrameIndex, const TargetRegisterClass *RC,
+    const TargetRegisterInfo *TRI, Register VReg,
+    MachineInstr::MIFlag Flags) const {
+  DebugLoc DL = MI->getDebugLoc();
+  BuildMI(MBB, MI, DL, get(Rus::SW))
+      .addReg(SrcReg, getKillRegState(IsKill))
+      .addFrameIndex(FrameIndex)
+      .addImm(0);
+}
+
+void RusInstrInfo::loadRegFromStackSlot(MachineBasicBlock &MBB,
+                                        MachineBasicBlock::iterator MI,
+                                        Register DestReg, int FrameIndex,
+                                        const TargetRegisterClass *RC,
+                                        const TargetRegisterInfo *TRI,
+                                        Register VReg,
+                                        MachineInstr::MIFlag Flags) const {
+  DebugLoc DL = MI->getDebugLoc();
+  BuildMI(MBB, MI, DL, get(Rus::LW))
+      .addReg(DestReg, RegState::Define)
+      .addFrameIndex(FrameIndex)
+      .addImm(0);
+}
