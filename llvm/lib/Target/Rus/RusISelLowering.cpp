@@ -52,7 +52,9 @@ RusTargetLowering::RusTargetLowering(const TargetMachine &TM,
   setOperationAction(ISD::ADD, MVT::i32, Legal);
   setOperationAction(ISD::MUL, MVT::i32, Legal);
   setOperationAction(ISD::AND, MVT::i32, Legal);
+  setOperationAction(ISD::OR,  MVT::i32, Legal);
   setOperationAction(ISD::SREM, MVT::i32, Legal);
+  setOperationAction(ISD::SHL, MVT::i32, Legal);
 
   setOperationAction(ISD::LOAD, MVT::i32, Legal);
   setOperationAction(ISD::STORE, MVT::i32, Legal);

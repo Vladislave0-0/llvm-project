@@ -19,6 +19,7 @@ enum NodeType : unsigned {
   CALL,
   BR_CC,
   INC_EQ,
+  MOVi,
 };
 
 } // namespace RusISD
