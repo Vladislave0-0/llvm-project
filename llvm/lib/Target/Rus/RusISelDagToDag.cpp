@@ -173,12 +173,27 @@ void RusDAGToDAGISel::Select(SDNode *Node) {
     return;
   }
 
+  case ISD::GlobalAddress: {
+    GlobalAddressSDNode *GN = cast<GlobalAddressSDNode>(Node);
+    SDValue TGA = CurDAG->getTargetGlobalAddress(GN->getGlobal(), SDLoc(Node),
+                                                 MVT::i32, GN->getOffset());
+
+    MachineSDNode *M =
+        CurDAG->getMachineNode(Rus::MOVi, SDLoc(Node), MVT::i32, TGA);
+    ReplaceNode(Node, M);
+
+    return;
+  }
+
   case RusISD::CALL: {
     SDValue Chain = Node->getOperand(0);
     SDValue Callee = Node->getOperand(1);
 
     if (auto *ES = dyn_cast<ExternalSymbolSDNode>(Callee))
       Callee = CurDAG->getTargetExternalSymbol(ES->getSymbol(), MVT::i32);
+    else if (auto *GA = dyn_cast<GlobalAddressSDNode>(Callee))
+      Callee = CurDAG->getTargetGlobalAddress(GA->getGlobal(), DL, MVT::i32,
+                                              GA->getOffset());
 
     SmallVector<SDValue, 8> Ops;
     Ops.push_back(Callee);
@@ -189,7 +204,7 @@ void RusDAGToDAGISel::Select(SDNode *Node) {
 
     for (unsigned i = 2; i < GlueIdx; ++i)
       Ops.push_back(Node->getOperand(i));
-    
+
     Ops.push_back(Chain);
     if (HasGlue)
       Ops.push_back(Node->getOperand(GlueIdx));
