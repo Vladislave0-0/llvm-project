@@ -67,8 +67,8 @@ private:
                       LLVMContext &Context, const Type *RetTy) const override;
 
   SDValue LowerOperation(SDValue Op, SelectionDAG &DAG) const override;
-  SDValue lowerBR_CC(SDValue Op, SelectionDAG &DAG) const;
-  SDValue lowerSETCC(SDValue Op, SelectionDAG &DAG) const;
+  SDValue LowerBR_CC(SDValue Op, SelectionDAG &DAG) const;
+  SDValue LowerSETCC(SDValue Op, SelectionDAG &DAG) const;
   unsigned getIsdOpIncCmp(ISD::CondCode CCVal) const;
 };
 

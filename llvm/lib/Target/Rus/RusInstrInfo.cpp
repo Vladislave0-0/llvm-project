@@ -15,3 +15,17 @@ using namespace llvm;
 #define DEBUG_TYPE "Rus-inst-info"
 
 RusInstrInfo::RusInstrInfo() : RusGenInstrInfo() { RUS_DUMP_GREEN }
+
+void RusInstrInfo::copyPhysReg(MachineBasicBlock &MBB,
+                               MachineBasicBlock::iterator MBBI,
+                               const DebugLoc &DL, MCRegister DstReg,
+                               MCRegister SrcReg, bool KillSrc,
+                               bool RenamableDest, bool RenamableSrc) const {
+  if (Rus::GPRRegClass.contains(DstReg, SrcReg)) {
+    BuildMI(MBB, MBBI, DL, get(Rus::MOV), DstReg)
+        .addReg(SrcReg, getKillRegState(KillSrc));
+    return;
+  }
+
+  llvm_unreachable("can't copyPhysReg");
+}

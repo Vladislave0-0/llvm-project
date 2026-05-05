@@ -88,13 +88,13 @@ const char *RusTargetLowering::getTargetNodeName(unsigned Opcode) const {
 SDValue RusTargetLowering::LowerOperation(SDValue Op, SelectionDAG &DAG) const {
   switch (Op->getOpcode()) {
   case ISD::BR_CC:
-    return lowerBR_CC(Op, DAG);
+    return LowerBR_CC(Op, DAG);
   default:
     llvm_unreachable("Unimplemented custom lowering");
   }
 }
 
-SDValue RusTargetLowering::lowerBR_CC(SDValue Op, SelectionDAG &DAG) const {
+SDValue RusTargetLowering::LowerBR_CC(SDValue Op, SelectionDAG &DAG) const {
   SDLoc DL(Op);
   SDValue Chain = Op.getOperand(0);
   ISD::CondCode CCVal = cast<CondCodeSDNode>(Op.getOperand(1))->get();
