@@ -18,7 +18,7 @@ enum NodeType : unsigned {
   RET,
   CALL,
   BR_CC,
-  INC_EQi,
+  INC_EQ,
 };
 
 } // namespace RusISD
