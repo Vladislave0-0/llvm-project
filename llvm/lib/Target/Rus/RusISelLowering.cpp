@@ -58,6 +58,8 @@ RusTargetLowering::RusTargetLowering(const TargetMachine &TM,
   setOperationAction(ISD::Constant, MVT::i32, Legal);
   setOperationAction(ISD::UNDEF, MVT::i32, Legal);
 
+  setOperationAction(ISD::SETCC, MVT::i32, Legal);
+
   setOperationAction(ISD::BR, MVT::Other, Legal);
   setOperationAction(ISD::BR_CC, MVT::i32, Custom);
 
@@ -73,6 +75,8 @@ const char *RusTargetLowering::getTargetNodeName(unsigned Opcode) const {
     return "RusISD::RET";
   case RusISD::BR_CC:
     return "RusISD::BR_CC";
+  case RusISD::INC_EQi:
+    return "RusISD::INC_EQi";
   }
   return nullptr;
 }
@@ -96,6 +100,16 @@ SDValue RusTargetLowering::lowerBR_CC(SDValue Op, SelectionDAG &DAG) const {
 
   SDValue Cond = DAG.getSetCC(DL, MVT::i32, LHS, RHS, CCVal);
   return DAG.getNode(RusISD::BR_CC, DL, MVT::Other, Chain, Cond, Dest);
+}
+
+unsigned RusTargetLowering::getIsdOpIncCmp(ISD::CondCode CCVal) const {
+  switch (CCVal) {
+  case ISD::SETEQ:
+    return RusISD::INC_EQi;
+  // May be other CCVals. For example:INC_NEi or INC_GEi
+  default:
+    llvm_unreachable("Unhandled CC for INC_CMP");
+  }
 }
 
 //===----------------------------------------------------------------------===//

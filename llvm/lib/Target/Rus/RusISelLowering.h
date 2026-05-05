@@ -18,6 +18,7 @@ enum NodeType : unsigned {
   RET,
   CALL,
   BR_CC,
+  INC_EQi,
 };
 
 } // namespace RusISD
@@ -66,6 +67,7 @@ private:
 
   SDValue LowerOperation(SDValue Op, SelectionDAG &DAG) const override;
   SDValue lowerBR_CC(SDValue Op, SelectionDAG &DAG) const;
+  unsigned getIsdOpIncCmp(ISD::CondCode CCVal) const;
 };
 
 } // end namespace llvm

@@ -93,3 +93,18 @@ def PUTPIXEL : RusInst<0xEE, (outs), (ins GPR:$r1, GPR:$r2, GPR:$r3_imm),
 // rand
 let r2 = 0, r3_imm = 0 in
 def RAND : RusInst<0xDD, (outs GPR:$r1), (ins), "RAND $r1", [(set GPR:$r1, (int_rus_rand))]>;
+
+
+let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in {
+def CMP_EQ  : RusInst<0x09, (outs GPR:$r1), (ins GPR:$r2, GPR:$r3_imm),
+                "CMP_EQ $r1 $r2 $r3_imm",
+                [(set GPR:$r1, (seteq  GPR:$r2, GPR:$r3_imm))]>;
+
+def CMP_LT  : RusInst<0x0A, (outs GPR:$r1), (ins GPR:$r2, GPR:$r3_imm),
+                "CMP_LT $r1 $r2 $r3_imm",
+                [(set GPR:$r1, (setlt  GPR:$r2, GPR:$r3_imm))]>;
+
+def CMP_GE  : RusInst<0x0B, (outs GPR:$r1), (ins GPR:$r2, GPR:$r3_imm),
+                "CMP_GE $r1 $r2 $r3_imm",
+                [(set GPR:$r1, (setge  GPR:$r2, GPR:$r3_imm))]>;
+} // hasSideEffects = 0
