@@ -169,3 +169,19 @@ def CMP_GE  : RusInst<0x0B, (outs GPR:$r1), (ins GPR:$r2, GPR:$r3_imm),
                 "CMP_GE $r1 $r2 $r3_imm",
                 [(set GPR:$r1, (setge  GPR:$r2, GPR:$r3_imm))]>;
 }
+
+// Load Word
+let mayLoad = 1, hasSideEffects = 0 in
+def LW : RusInst<0x10, (outs GPR:$r1), (ins GPR:$r2, simm32:$r3_imm),
+         "LW $r1 $r2 $r3_imm",
+         [(set GPR:$r1, (load (add GPR:$r2, simm32:$r3_imm)))]>;
+
+// Store Word
+let mayStore = 1, hasSideEffects = 0 in
+def SW : RusInst<0x11, (outs), (ins GPR:$r1, GPR:$r2, simm32:$r3_imm),
+         "SW $r1 $r2 $r3_imm",
+         [(store (i32 GPR:$r1), (add GPR:$r2, simm32:$r3_imm))]>;
+
+// Patterns for LW and SW
+def : Pat<(i32 (load GPR:$r2)), (LW GPR:$r2, 0)>;
+def : Pat<(store (i32 GPR:$r1), GPR:$r2), (SW GPR:$r1, GPR:$r2, 0)>;

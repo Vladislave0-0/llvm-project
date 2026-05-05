@@ -15,12 +15,13 @@ public:
     RUS_DUMP_GREEN
   }
 
-  /// emitProlog/emitEpilog - These methods insert prolog and epilog code into
-  /// the function.
-  void emitPrologue(MachineFunction &MF,
-                    MachineBasicBlock &MBB) const override {}
-  void emitEpilogue(MachineFunction &MF,
-                    MachineBasicBlock &MBB) const override {}
+  /// emitPrologue/emitEpilogue - These methods insert prologue and epilogue
+  /// code into the function.
+  void emitPrologue(MachineFunction &MF, MachineBasicBlock &MBB) const override;
+  void emitEpilogue(MachineFunction &MF, MachineBasicBlock &MBB) const override;
+
+  StackOffset getFrameIndexReference(const MachineFunction &MF, int FI,
+                                     Register &FrameReg) const override;
 
   /// hasFP - Return true if the specified function should have a dedicated
   /// frame pointer register. For most targets this is true only if the function

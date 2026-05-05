@@ -76,6 +76,106 @@ void RusDAGToDAGISel::Select(SDNode *Node) {
     Node->setNodeId(-1);
     return;
   }
+
+  unsigned Opcode = Node->getOpcode();
   SDLoc DL(Node);
+
+  switch (Opcode) {
+  case ISD::FrameIndex: {
+    int FI = cast<FrameIndexSDNode>(Node)->getIndex();
+    SDValue TFI = CurDAG->getTargetFrameIndex(FI, MVT::i32);
+    SDValue Zero = CurDAG->getTargetConstant(0, DL, MVT::i32);
+    SDNode *Res = CurDAG->getMachineNode(Rus::ADDi, DL, MVT::i32, {TFI, Zero});
+    ReplaceNode(Node, Res);
+
+    return;
+  }
+
+  case ISD::LOAD: {
+    auto *LD = cast<LoadSDNode>(Node);
+    if (LD->getExtensionType() != ISD::NON_EXTLOAD ||
+        LD->getMemoryVT() != MVT::i32)
+      break;
+
+    SDValue Addr = LD->getBasePtr();
+    SDValue TFI, Imm;
+
+    if (auto *FIN = dyn_cast<FrameIndexSDNode>(Addr)) {
+      TFI = CurDAG->getTargetFrameIndex(FIN->getIndex(), MVT::i32);
+      Imm = CurDAG->getTargetConstant(0, DL, MVT::i32);
+    } else if (Addr.getOpcode() == ISD::ADD || Addr.getOpcode() == ISD::OR) {
+      auto *FIN = dyn_cast<FrameIndexSDNode>(Addr.getOperand(0));
+      auto *C = dyn_cast<ConstantSDNode>(Addr.getOperand(1));
+
+      if (!FIN || !C || !isInt<32>(C->getSExtValue()))
+        break;
+
+      TFI = CurDAG->getTargetFrameIndex(FIN->getIndex(), MVT::i32);
+      Imm = CurDAG->getTargetConstant(C->getSExtValue(), DL, MVT::i32);
+    } else {
+      break;
+    }
+
+    SDNode *Res = CurDAG->getMachineNode(Rus::LW, DL, {MVT::i32, MVT::Other},
+                                         {TFI, Imm, LD->getChain()});
+    CurDAG->setNodeMemRefs(cast<MachineSDNode>(Res), {LD->getMemOperand()});
+    ReplaceUses(SDValue(Node, 0), SDValue(Res, 0));
+    ReplaceUses(SDValue(Node, 1), SDValue(Res, 1));
+    CurDAG->RemoveDeadNode(Node);
+
+    return;
+  }
+
+  case ISD::STORE: {
+    auto *ST = cast<StoreSDNode>(Node);
+    if (ST->isTruncatingStore())
+      break;
+
+    SDValue Addr = ST->getBasePtr();
+    SDValue TFI, Imm;
+
+    if (auto *FIN = dyn_cast<FrameIndexSDNode>(Addr)) {
+      TFI = CurDAG->getTargetFrameIndex(FIN->getIndex(), MVT::i32);
+      Imm = CurDAG->getTargetConstant(0, DL, MVT::i32);
+    } else if (Addr.getOpcode() == ISD::ADD || Addr.getOpcode() == ISD::OR) {
+      auto *FIN = dyn_cast<FrameIndexSDNode>(Addr.getOperand(0));
+      auto *C = dyn_cast<ConstantSDNode>(Addr.getOperand(1));
+
+      if (!FIN || !C || !isInt<32>(C->getSExtValue()))
+        break;
+
+      TFI = CurDAG->getTargetFrameIndex(FIN->getIndex(), MVT::i32);
+      Imm = CurDAG->getTargetConstant(C->getSExtValue(), DL, MVT::i32);
+    } else {
+      break;
+    }
+
+    SDNode *Res = CurDAG->getMachineNode(
+        Rus::SW, DL, MVT::Other, {ST->getValue(), TFI, Imm, ST->getChain()});
+    CurDAG->setNodeMemRefs(cast<MachineSDNode>(Res), {ST->getMemOperand()});
+    ReplaceUses(SDValue(Node, 0), SDValue(Res, 0));
+    CurDAG->RemoveDeadNode(Node);
+
+    return;
+  }
+
+  case RusISD::INC_EQ: {
+    SDNode *INC_EQ = CurDAG->getMachineNode(
+        Rus::INC_EQ, DL, {MVT::i32, MVT::i32},
+        {Node->getOperand(0),
+         CurDAG->getTargetConstant(Node->getConstantOperandVal(1), DL,
+                                   MVT::i32)});
+
+    ReplaceUses(SDValue(Node, 0), SDValue(INC_EQ, 0));
+    ReplaceUses(SDValue(Node, 1), SDValue(INC_EQ, 1));
+    CurDAG->RemoveDeadNode(Node);
+
+    return;
+  }
+
+  default:
+    break;
+  }
+
   SelectCode(Node);
 }

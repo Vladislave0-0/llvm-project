@@ -52,7 +52,7 @@ RusTargetLowering::RusTargetLowering(const TargetMachine &TM,
   setOperationAction(ISD::ADD, MVT::i32, Legal);
   setOperationAction(ISD::MUL, MVT::i32, Legal);
   setOperationAction(ISD::AND, MVT::i32, Legal);
-  setOperationAction(ISD::OR,  MVT::i32, Legal);
+  setOperationAction(ISD::OR, MVT::i32, Legal);
   setOperationAction(ISD::SREM, MVT::i32, Legal);
   setOperationAction(ISD::SHL, MVT::i32, Legal);
 
@@ -102,6 +102,22 @@ SDValue RusTargetLowering::LowerBR_CC(SDValue Op, SelectionDAG &DAG) const {
   SDValue RHS = Op.getOperand(3);
   SDValue Dest = Op.getOperand(4);
 
+  if (CCVal == ISD::CondCode::SETEQ && LHS->getOpcode() == ISD::ADD) {
+    SDValue INC = LHS->getOperand(1);
+
+    if (INC->getOpcode() == ISD::Constant &&
+        cast<ConstantSDNode>(INC)->getZExtValue() == 1) {
+      SDValue INC_EQ_ =
+          DAG.getNode(Rus::INC_EQ, LHS, DAG.getVTList({MVT::i32, MVT::i32}),
+                      LHS->getOperand(0), RHS);
+      DAG.ReplaceAllUsesWith(LHS, INC_EQ_.getValue(1));
+      DAG.RemoveDeadNode(LHS.getNode());
+
+      return DAG.getNode(RusISD::BR_CC, DL, MVT::Other, Chain,
+                         INC_EQ_.getValue(0), Dest);
+    }
+  }
+
   SDValue Cond = DAG.getSetCC(DL, MVT::i32, LHS, RHS, CCVal);
   return DAG.getNode(RusISD::BR_CC, DL, MVT::Other, Chain, Cond, Dest);
 }
@@ -110,7 +126,7 @@ unsigned RusTargetLowering::getIsdOpIncCmp(ISD::CondCode CCVal) const {
   switch (CCVal) {
   case ISD::SETEQ:
     return RusISD::INC_EQ;
-  // May be other CCVals. For example:INC_NEi or INC_GEi
+  // May be other CCVals. For example: INC_NEi or INC_GEi
   default:
     llvm_unreachable("Unhandled CC for INC_CMP");
   }
