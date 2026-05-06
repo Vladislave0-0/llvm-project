@@ -76,6 +76,7 @@ RusTargetLowering::RusTargetLowering(const TargetMachine &TM,
 
 const char *RusTargetLowering::getTargetNodeName(unsigned Opcode) const {
   RUS_DUMP_RED
+
   switch (Opcode) {
   case RusISD::CALL:
     return "RusISD::CALL";
@@ -85,7 +86,12 @@ const char *RusTargetLowering::getTargetNodeName(unsigned Opcode) const {
     return "RusISD::BR_CC";
   case RusISD::INC_EQ:
     return "RusISD::INC_EQ";
+  case RusISD::MEMSET:
+    return "RusISD::MEMSET";
+  case RusISD::MEMCPY:
+    return "RusISD::MEMCPY";
   }
+
   return nullptr;
 }
 

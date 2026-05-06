@@ -221,3 +221,14 @@ def SW : RusInstI<0x11, (outs), (ins GPR:$r1, GPR:$r2, simm32:$imm32),
 // Patterns for LW and SW
 def : Pat<(i32 (load GPR:$r2)), (LW GPR:$r2, 0)>;
 def : Pat<(store (i32 GPR:$r1), GPR:$r2), (SW GPR:$r1, GPR:$r2, 0)>;
+
+// MEMSET
+let hasSideEffects = 1, mayLoad = 0, mayStore = 1 in
+def MEMSET : RusInstR<0x93, (outs), (ins GPR:$r1, GPR:$r2, GPR:$r3_reg),
+    "MEMSET $r1 $r2 $r3_reg", []>;
+
+//MEMCPY
+let hasSideEffects = 1, mayLoad = 1, mayStore = 1 in
+def MEMCPY : RusInstR<0x94, (outs), (ins GPR:$r1, GPR:$r2, GPR:$r3_reg),
+    "MEMCPY $r1 $r2 $r3_reg", []>;
+

@@ -20,6 +20,8 @@ enum NodeType : unsigned {
   BR_CC,
   INC_EQ,
   MOVi,
+  MEMSET,
+  MEMCPY,
 };
 
 } // namespace RusISD

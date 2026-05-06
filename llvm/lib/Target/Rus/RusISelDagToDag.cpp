@@ -216,6 +216,34 @@ void RusDAGToDAGISel::Select(SDNode *Node) {
     return;
   }
 
+  case RusISD::MEMSET: {
+    SDValue Chain = Node->getOperand(0);
+    SDValue Dst = Node->getOperand(1);
+    SDValue Val = Node->getOperand(2);
+    SDValue Size = Node->getOperand(3);
+
+    SDNode *Res = CurDAG->getMachineNode(Rus::MEMSET, DL, MVT::Other,
+                                         {Dst, Val, Size, Chain});
+    ReplaceUses(SDValue(Node, 0), SDValue(Res, 0));
+    CurDAG->RemoveDeadNode(Node);
+
+    return;
+  }
+
+  case RusISD::MEMCPY: {
+    SDValue Chain = Node->getOperand(0);
+    SDValue Dst = Node->getOperand(1);
+    SDValue Src = Node->getOperand(2);
+    SDValue Size = Node->getOperand(3);
+
+    SDNode *Res = CurDAG->getMachineNode(Rus::MEMCPY, DL, MVT::Other,
+                                         {Dst, Src, Size, Chain});
+    ReplaceUses(SDValue(Node, 0), SDValue(Res, 0));
+    CurDAG->RemoveDeadNode(Node);
+
+    return;
+  }
+
   default:
     break;
   }
