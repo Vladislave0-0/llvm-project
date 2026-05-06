@@ -45,8 +45,8 @@ class RusInst<bits<8> op, dag outs, dag ins, string asmstr, list<dag> pattern>: 
 // Used for computations where all operands are registers (e.g., ADD, MUL).
 class RusInstR<bits<8> op, dag outs, dag ins, string asmstr, list<dag> pattern>
     : RusInst<op, outs, ins, asmstr, pattern> {
-  bits<4> r3_reg;
-  let Inst{3-0} = r3_reg;
+  bits<4> r3;
+  let Inst{3-0} = r3;
 }
 
 // I-type: Immediate operations.

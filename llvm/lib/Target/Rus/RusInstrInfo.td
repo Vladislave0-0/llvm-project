@@ -114,15 +114,15 @@ def ADDi : RusInstI<0x2, (outs GPR:$r1), (ins GPR:$r2, simm32:$imm32),
 
 // ADD
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def ADD : RusInstR<0x1, (outs GPR:$r1), (ins GPR:$r2, GPR:$r3_reg),
-          "ADD $r1 $r2 $r3_reg",
-          [(set GPR:$r1, (add GPR:$r2, GPR:$r3_reg))]>;
+def ADD : RusInstR<0x1, (outs GPR:$r1), (ins GPR:$r2, GPR:$r3),
+          "ADD $r1 $r2 $r3",
+          [(set GPR:$r1, (add GPR:$r2, GPR:$r3))]>;
 
 // SHL
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def SHL : RusInstR<0x5, (outs GPR:$r1), (ins GPR:$r2, GPR:$r3_reg),
-          "SHL $r1 $r2 $r3_reg",
-          [(set GPR:$r1, (shl GPR:$r2, GPR:$r3_reg))]>;
+def SHL : RusInstR<0x5, (outs GPR:$r1), (ins GPR:$r2, GPR:$r3),
+          "SHL $r1 $r2 $r3",
+          [(set GPR:$r1, (shl GPR:$r2, GPR:$r3))]>;
 
 // ANDi
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
@@ -132,15 +132,15 @@ def ANDi : RusInstI<0x8, (outs GPR:$r1), (ins GPR:$r2, simm32:$imm32),
 
 // AND
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def AND : RusInstR<0x7, (outs GPR:$r1), (ins GPR:$r2, GPR:$r3_reg),
-          "AND $r1 $r2 $r3_reg",
-          [(set GPR:$r1, (and GPR:$r2, GPR:$r3_reg))]>;
+def AND : RusInstR<0x7, (outs GPR:$r1), (ins GPR:$r2, GPR:$r3),
+          "AND $r1 $r2 $r3",
+          [(set GPR:$r1, (and GPR:$r2, GPR:$r3))]>;
 
 // OR
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def OR : RusInstR<0x6, (outs GPR:$r1), (ins GPR:$r2, GPR:$r3_reg),
-         "OR $r1 $r2 $r3_reg",
-         [(set GPR:$r1, (or GPR:$r2, GPR:$r3_reg))]>;
+def OR : RusInstR<0x6, (outs GPR:$r1), (ins GPR:$r2, GPR:$r3),
+         "OR $r1 $r2 $r3",
+         [(set GPR:$r1, (or GPR:$r2, GPR:$r3))]>;
 
 // MOVi
 let isAsCheapAsAMove = 1, isCodeGenOnly = 1, isReMaterializable = 1, r2 = 0 in
@@ -155,9 +155,9 @@ def MOV : RusInst<0x3, (outs GPR:$r1), (ins GPR:$r2),
 
 // MUL!
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
-def MUL : RusInstR<0x88, (outs GPR:$r1), (ins GPR:$r2, GPR:$r3_reg),
-          "MUL $r1 $r2 $r3_reg",
-          [(set GPR:$r1, (mul GPR:$r2, GPR:$r3_reg))]>;
+def MUL : RusInstR<0x88, (outs GPR:$r1), (ins GPR:$r2, GPR:$r3),
+          "MUL $r1 $r2 $r3",
+          [(set GPR:$r1, (mul GPR:$r2, GPR:$r3))]>;
 
 // SREMi!
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in
@@ -175,8 +175,8 @@ let r1 = 0, r2 = 0, r3_imm = 0 in
 def FLUSH : RusInst<0xFF, (outs), (ins), "FLUSH", [(int_rus_flush)]>;
 
 // PUTPIXEL
-def PUTPIXEL : RusInstR<0xEE, (outs), (ins GPR:$r1, GPR:$r2, GPR:$r3_reg),
-                      "PUTPIXEL $r1 $r2 $r3_reg", [(int_rus_putpixel GPR:$r1, GPR:$r2, GPR:$r3_reg)]>;
+def PUTPIXEL : RusInstR<0xEE, (outs), (ins GPR:$r1, GPR:$r2, GPR:$r3),
+                      "PUTPIXEL $r1 $r2 $r3", [(int_rus_putpixel GPR:$r1, GPR:$r2, GPR:$r3)]>;
 
 // RAND
 let r2 = 0, r3_imm = 0 in
@@ -185,19 +185,19 @@ def RAND : RusInst<0xDD, (outs GPR:$r1), (ins), "RAND $r1", [(set GPR:$r1, (int_
 
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in {
 // CMP_EQ
-def CMP_EQ  : RusInstR<0x09, (outs GPR:$r1), (ins GPR:$r2, GPR:$r3_reg),
-                "CMP_EQ $r1 $r2 $r3_reg",
-                [(set GPR:$r1, (seteq  GPR:$r2, GPR:$r3_reg))]>;
+def CMP_EQ  : RusInstR<0x09, (outs GPR:$r1), (ins GPR:$r2, GPR:$r3),
+                "CMP_EQ $r1 $r2 $r3",
+                [(set GPR:$r1, (seteq  GPR:$r2, GPR:$r3))]>;
 
 // CMP_LT
-def CMP_LT  : RusInstR<0x0A, (outs GPR:$r1), (ins GPR:$r2, GPR:$r3_reg),
-                "CMP_LT $r1 $r2 $r3_reg",
-                [(set GPR:$r1, (setlt  GPR:$r2, GPR:$r3_reg))]>;
+def CMP_LT  : RusInstR<0x0A, (outs GPR:$r1), (ins GPR:$r2, GPR:$r3),
+                "CMP_LT $r1 $r2 $r3",
+                [(set GPR:$r1, (setlt  GPR:$r2, GPR:$r3))]>;
 
 // CMP_GE
-def CMP_GE  : RusInstR<0x0B, (outs GPR:$r1), (ins GPR:$r2, GPR:$r3_reg),
-                "CMP_GE $r1 $r2 $r3_reg",
-                [(set GPR:$r1, (setge  GPR:$r2, GPR:$r3_reg))]>;
+def CMP_GE  : RusInstR<0x0B, (outs GPR:$r1), (ins GPR:$r2, GPR:$r3),
+                "CMP_GE $r1 $r2 $r3",
+                [(set GPR:$r1, (setge  GPR:$r2, GPR:$r3))]>;
 }
 
 // SELECT
@@ -224,11 +224,10 @@ def : Pat<(store (i32 GPR:$r1), GPR:$r2), (SW GPR:$r1, GPR:$r2, 0)>;
 
 // MEMSET
 let hasSideEffects = 1, mayLoad = 0, mayStore = 1 in
-def MEMSET : RusInstR<0x93, (outs), (ins GPR:$r1, GPR:$r2, GPR:$r3_reg),
-    "MEMSET $r1 $r2 $r3_reg", []>;
+def MEMSET : RusInstR<0x93, (outs), (ins GPR:$r1, GPR:$r2, GPR:$r3),
+             "MEMSET $r1 $r2 $r3", []>;
 
 //MEMCPY
 let hasSideEffects = 1, mayLoad = 1, mayStore = 1 in
-def MEMCPY : RusInstR<0x94, (outs), (ins GPR:$r1, GPR:$r2, GPR:$r3_reg),
-    "MEMCPY $r1 $r2 $r3_reg", []>;
-
+def MEMCPY : RusInstR<0x94, (outs), (ins GPR:$r1, GPR:$r2, GPR:$r3),
+             "MEMCPY $r1 $r2 $r3", []>;
