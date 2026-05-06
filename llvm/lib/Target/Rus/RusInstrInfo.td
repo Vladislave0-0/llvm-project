@@ -127,13 +127,13 @@ defm SHL  : Arith<0x08, shl>;
 
 // MOVi
 let isAsCheapAsAMove = 1, isCodeGenOnly = 1, isReMaterializable = 1, r2 = 0 in
-def MOVi : RusInstI<0x4, (outs GPR:$r1), (ins simm32:$imm32),
+def MOVi : RusInstI<0x40, (outs GPR:$r1), (ins simm32:$imm32),
                   "MOVi $r1 $imm32",
                   [(set GPR:$r1, simm32:$imm32)]>;
 
 // MOV
 let isAsCheapAsAMove = 1, isCodeGenOnly = 1, isReMaterializable = 1, r3_imm = 0 in
-def MOV : RusInst<0x3, (outs GPR:$r1), (ins GPR:$r2),
+def MOV : RusInst<0x41, (outs GPR:$r1), (ins GPR:$r2),
           "MOV $r1 $r2", []>;
 
 // FLUSH
@@ -163,21 +163,47 @@ let Constraints = "$r2_tmp = $r2", hasSideEffects = 1, mayLoad = 0, mayStore = 0
 def INC_EQ : RusInstI<0x90, (outs GPR:$r1, GPR:$r2_tmp), (ins GPR:$r2, simm32:$imm32), 
              "INC_EQ $r1 $r2 $imm32", []>;
 
+// let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in {
+// // CMP_EQ
+// def CMP_EQ  : RusInstR<0x09, (outs GPR:$r1), (ins GPR:$r2, GPR:$r3),
+//                 "CMP_EQ $r1 $r2 $r3",
+//                 [(set GPR:$r1, (seteq  GPR:$r2, GPR:$r3))]>;
+
+// // CMP_LT
+// def CMP_LT  : RusInstR<0x0A, (outs GPR:$r1), (ins GPR:$r2, GPR:$r3),
+//                 "CMP_LT $r1 $r2 $r3",
+//                 [(set GPR:$r1, (setlt  GPR:$r2, GPR:$r3))]>;
+
+// // CMP_GE
+// def CMP_GE  : RusInstR<0x0B, (outs GPR:$r1), (ins GPR:$r2, GPR:$r3),
+//                 "CMP_GE $r1 $r2 $r3",
+//                 [(set GPR:$r1, (setge  GPR:$r2, GPR:$r3))]>;
+// }
+
+multiclass CmpInst<bits<8> opcode, string Name, CondCode cc> {
+  // Reg-Reg
+  def "" : RusInstR<opcode, (outs GPR:$r1), (ins GPR:$r2, GPR:$r3),
+           Name#" $r1 $r2 $r3",
+           [(set GPR:$r1, (setcc GPR:$r2, GPR:$r3, cc))]>;
+
+  // Reg-Imm
+  def "i" : RusInstI<opcode, (outs GPR:$r1), (ins GPR:$r2, simm32:$imm32),
+            Name#"i $r1 $r2 $imm32",
+            [(set GPR:$r1, (setcc GPR:$r2, simm32:$imm32, cc))]>;
+}
+
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in {
-// CMP_EQ
-def CMP_EQ  : RusInstR<0x09, (outs GPR:$r1), (ins GPR:$r2, GPR:$r3),
-                "CMP_EQ $r1 $r2 $r3",
-                [(set GPR:$r1, (seteq  GPR:$r2, GPR:$r3))]>;
+  defm CMP_EQ  : CmpInst<0x20, "CMP_EQ",  SETEQ>;
+  defm CMP_NE  : CmpInst<0x21, "CMP_NE",  SETNE>;
+  defm CMP_LT  : CmpInst<0x22, "CMP_LT",  SETLT>;
+  defm CMP_LE  : CmpInst<0x23, "CMP_LE",  SETLE>;
+  defm CMP_GT  : CmpInst<0x24, "CMP_GT",  SETGT>;
+  defm CMP_GE  : CmpInst<0x25, "CMP_GE",  SETGE>;
 
-// CMP_LT
-def CMP_LT  : RusInstR<0x0A, (outs GPR:$r1), (ins GPR:$r2, GPR:$r3),
-                "CMP_LT $r1 $r2 $r3",
-                [(set GPR:$r1, (setlt  GPR:$r2, GPR:$r3))]>;
-
-// CMP_GE
-def CMP_GE  : RusInstR<0x0B, (outs GPR:$r1), (ins GPR:$r2, GPR:$r3),
-                "CMP_GE $r1 $r2 $r3",
-                [(set GPR:$r1, (setge  GPR:$r2, GPR:$r3))]>;
+  defm CMP_ULT : CmpInst<0x30, "CMP_ULT", SETULT>;
+  defm CMP_ULE : CmpInst<0x31, "CMP_ULE", SETULE>;
+  defm CMP_UGT : CmpInst<0x32, "CMP_UGT", SETUGT>;
+  defm CMP_UGE : CmpInst<0x33, "CMP_UGE", SETUGE>;
 }
 
 // SELECT
