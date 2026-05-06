@@ -1,3 +1,4 @@
+#include "MCTargetDesc/RusFixupKinds.h"
 #include "MCTargetDesc/RusMCTargetDesc.h"
 #include "llvm/ADT/StringSwitch.h"
 #include "llvm/MC/MCAsmBackend.h"
@@ -21,7 +22,26 @@ public:
   RusAsmBackend(const Target &T)
       : MCAsmBackend(llvm::endianness::little), TheTarget(T) {}
 
-  unsigned getNumFixupKinds() const override { return 0; }
+  unsigned getNumFixupKinds() const override {
+    return Rus::NumTargetFixupKinds;
+  }
+
+  const MCFixupKindInfo &getFixupKindInfo(MCFixupKind Kind) const override {
+    const static MCFixupKindInfo InfosLE[Rus::NumTargetFixupKinds] = {
+        {"fixup_Rus_PC32", 0, 32, MCFixupKindInfo::FKF_IsPCRel},
+    };
+
+    if (Kind >= FirstLiteralRelocationKind)
+      return MCAsmBackend::getFixupKindInfo(FK_NONE);
+
+    if (Kind < FirstTargetFixupKind)
+      return MCAsmBackend::getFixupKindInfo(Kind);
+
+    assert(unsigned(Kind - FirstTargetFixupKind) < getNumFixupKinds() &&
+           "Invalid kind!");
+
+    return InfosLE[Kind - FirstTargetFixupKind];
+  }
 
   bool writeNopData(raw_ostream &OS, uint64_t Count,
                     const MCSubtargetInfo *STI) const override {
@@ -48,7 +68,19 @@ public:
                   const MCValue &Target, MutableArrayRef<char> Data,
                   uint64_t Value, bool IsResolved,
                   const MCSubtargetInfo *STI) const override {
-    return;
+    unsigned NumBytes = 0;
+    switch ((unsigned)Fixup.getKind()) {
+    default:
+      return;
+    case Rus::fixup_Rus_PC32:
+      Value /= 4;
+      NumBytes = 4;
+      break;
+    }
+
+    unsigned Offset = Fixup.getOffset();
+    for (unsigned i = 0; i != NumBytes; ++i)
+      Data[Offset + i] |= uint8_t((Value >> (i * 8)) & 0xff);
   }
 
   std::unique_ptr<MCObjectTargetWriter>

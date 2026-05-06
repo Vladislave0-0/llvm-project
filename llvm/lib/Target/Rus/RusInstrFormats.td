@@ -33,12 +33,36 @@ class RusInst<bits<8> op, dag outs, dag ins, string asmstr, list<dag> pattern>: 
   let Inst{55-52} = r1;
   let Inst{51-48} = r2;
   let Inst{47-32} = 0;
-  let Inst{31-0}  = r3_imm;
+  let Inst{31-0}  = 0;
 
   let OutOperandList = outs;
   let InOperandList  = ins;
   let AsmString   = asmstr;
   let Pattern     = pattern;
+}
+
+// R-type: Register-to-register operations.
+// Used for computations where all operands are registers (e.g., ADD, MUL).
+class RusInstR<bits<8> op, dag outs, dag ins, string asmstr, list<dag> pattern>
+    : RusInst<op, outs, ins, asmstr, pattern> {
+  bits<4> r3_reg;
+  let Inst{3-0} = r3_reg;
+}
+
+// I-type: Immediate operations.
+// Used for instructions that include a 32-bit constant value (e.g., ADDi, LW, SW).
+class RusInstI<bits<8> op, dag outs, dag ins, string asmstr, list<dag> pattern>
+    : RusInst<op, outs, ins, asmstr, pattern> {
+  bits<32> imm32;
+  let Inst{31-0} = imm32;
+}
+
+// B-type: Branch and Call operations.
+// A specialized format for jump targets, supporting PC-relative addressing.
+class RusInstB<bits<8> op, dag outs, dag ins, string asmstr, list<dag> pattern>
+    : RusInst<op, outs, ins, asmstr, pattern> {
+  bits<32> btarget;
+  let Inst{31-0} = btarget;
 }
 
 // Pseudo instructions format

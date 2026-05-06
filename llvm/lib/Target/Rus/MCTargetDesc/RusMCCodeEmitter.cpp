@@ -1,3 +1,4 @@
+#include "MCTargetDesc/RusFixupKinds.h"
 #include "MCTargetDesc/RusMCTargetDesc.h"
 #include "Rus.h"
 #include "llvm/ADT/SmallVector.h"
@@ -54,10 +55,12 @@ public:
   unsigned getMachineOpValue(const MCInst &MI, const MCOperand &MO,
                              SmallVectorImpl<MCFixup> &Fixups,
                              const MCSubtargetInfo &STI) const;
+
   unsigned getSImm32OpValue(const MCInst &MI, unsigned OpNo,
                             SmallVectorImpl<MCFixup> &Fixups,
                             const MCSubtargetInfo &STI) const;
-  unsigned getBranchTarget32OpValue(const MCInst &MI, unsigned OpNo,
+
+  uint64_t getBranchTarget32OpValue(const MCInst &MI, unsigned OpNo,
                                     SmallVectorImpl<MCFixup> &Fixups,
                                     const MCSubtargetInfo &STI) const;
 };
@@ -117,7 +120,7 @@ unsigned RusMCCodeEmitter::getSImm32OpValue(const MCInst &MI, unsigned OpNo,
 /// getBranchTarget32OpValue - Return binary encoding of the branch
 /// target operand. If the machine operand requires relocation,
 /// record the relocation and return zero.
-unsigned
+uint64_t
 RusMCCodeEmitter::getBranchTarget32OpValue(const MCInst &MI, unsigned OpNo,
                                            SmallVectorImpl<MCFixup> &Fixups,
                                            const MCSubtargetInfo &STI) const {
@@ -129,6 +132,10 @@ RusMCCodeEmitter::getBranchTarget32OpValue(const MCInst &MI, unsigned OpNo,
 
   assert(MO.isExpr() &&
          "getBranchTarget32OpValue expects only expressions or immediates");
+
+  Fixups.push_back(
+      MCFixup::create(0, MO.getExpr(), MCFixupKind(Rus::fixup_Rus_PC32)));
+
   return 0;
 }
 

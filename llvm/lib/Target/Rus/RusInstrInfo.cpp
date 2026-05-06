@@ -14,7 +14,10 @@ using namespace llvm;
 
 #define DEBUG_TYPE "Rus-inst-info"
 
-RusInstrInfo::RusInstrInfo() : RusGenInstrInfo() { RUS_DUMP_GREEN }
+RusInstrInfo::RusInstrInfo()
+    : RusGenInstrInfo(Rus::ADJCALLSTACKDOWN, Rus::ADJCALLSTACKUP) {
+  RUS_DUMP_GREEN
+}
 
 void RusInstrInfo::copyPhysReg(MachineBasicBlock &MBB,
                                MachineBasicBlock::iterator MBBI,

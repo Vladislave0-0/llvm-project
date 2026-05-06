@@ -1,3 +1,4 @@
+#include "MCTargetDesc/RusFixupKinds.h"
 #include "MCTargetDesc/RusMCTargetDesc.h"
 #include "Rus.h"
 #include "llvm/ADT/STLExtras.h"
@@ -34,7 +35,12 @@ unsigned RusELFObjectWriter::getRelocType(MCContext &Ctx, const MCValue &Target,
   if (Kind >= FirstLiteralRelocationKind)
     return Kind - FirstLiteralRelocationKind;
 
-  llvm_unreachable("Unimplemented fixup -> relocation");
+  switch (unsigned(Kind)) {
+  case Rus::fixup_Rus_PC32:
+    return 1;
+  default:
+    llvm_unreachable("Unimplemented fixup -> relocation");
+  }
 }
 
 bool RusELFObjectWriter::needsRelocateWithSymbol(const MCValue &,
