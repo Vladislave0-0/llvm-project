@@ -6,7 +6,7 @@
 #include "RusISelLowering.h"
 #include "RusInstrInfo.h"
 #include "RusRegisterInfo.h"
-#include "llvm/CodeGen/SelectionDAGTargetInfo.h"
+#include "RusSelectionDAGInfo.h"
 #include "llvm/CodeGen/TargetSubtargetInfo.h"
 
 #define GET_SUBTARGETINFO_HEADER
@@ -19,7 +19,7 @@ class RusSubtarget : public RusGenSubtargetInfo {
   RusFrameLowering FrameLowering;
   RusRegisterInfo RegInfo;
   RusInstrInfo InstrInfo;
-  SelectionDAGTargetInfo TSInfo;
+  RusSelectionDAGInfo TSInfo;
 
 public:
   RusSubtarget(const Triple &TT, const std::string &CPU, const std::string &FS,

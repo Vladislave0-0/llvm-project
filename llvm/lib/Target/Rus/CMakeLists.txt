@@ -23,6 +23,7 @@ add_llvm_target(RusCodeGen
   RusISelLowering.cpp
   RusMCInstLower.cpp
   RusFrameLowering.cpp
+  RusSelectionDAGInfo.cpp
 
   LINK_COMPONENTS
   CodeGen
