@@ -120,10 +120,15 @@ defm ADD  : Arith<0x01, add>;
 defm SUB  : Arith<0x02, sub>;
 defm MUL  : Arith<0x03, mul>;
 defm DIV  : Arith<0x04, sdiv>;
-defm AND  : Arith<0x05, and>;
-defm OR   : Arith<0x06, or>;
-defm SREM : Arith<0x07, srem>;
-defm SHL  : Arith<0x08, shl>;
+defm UDIV : Arith<0x05, udiv>;
+defm AND  : Arith<0x06, and>;
+defm OR   : Arith<0x07, or>;
+defm XOR  : Arith<0x08, xor>;
+defm SREM : Arith<0x09, srem>;
+defm UREM : Arith<0x0a, urem>;
+defm SHL  : Arith<0x0b, shl>;
+defm SRL  : Arith<0x0d, srl>;
+defm SRA  : Arith<0x0e, sra>;
 
 // MOVi
 let isAsCheapAsAMove = 1, isCodeGenOnly = 1, isReMaterializable = 1, r2 = 0 in

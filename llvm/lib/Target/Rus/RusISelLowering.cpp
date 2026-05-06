@@ -44,20 +44,22 @@ RusTargetLowering::RusTargetLowering(const TargetMachine &TM,
 
   setStackPointerRegisterToSaveRestore(Rus::ZAKROM);
 
-  // setSchedulingPreference(Sched::Source);
-
   for (unsigned Opc = 0; Opc < ISD::BUILTIN_OP_END; ++Opc)
     setOperationAction(Opc, MVT::i32, Expand);
 
   setOperationAction(ISD::ADD, MVT::i32, Legal);
+  setOperationAction(ISD::SUB, MVT::i32, Legal);
   setOperationAction(ISD::MUL, MVT::i32, Legal);
+  setOperationAction(ISD::SDIV, MVT::i32, Legal);
+  setOperationAction(ISD::UDIV, MVT::i32, Legal);
   setOperationAction(ISD::AND, MVT::i32, Legal);
   setOperationAction(ISD::OR, MVT::i32, Legal);
+  setOperationAction(ISD::XOR, MVT::i32, Legal);
   setOperationAction(ISD::SREM, MVT::i32, Legal);
+  setOperationAction(ISD::UREM, MVT::i32, Legal);
   setOperationAction(ISD::SHL, MVT::i32, Legal);
-
-  setOperationAction(ISD::LOAD, MVT::i32, Legal);
-  setOperationAction(ISD::STORE, MVT::i32, Legal);
+  setOperationAction(ISD::SRL, MVT::i32, Legal);
+  setOperationAction(ISD::SRA, MVT::i32, Legal);
 
   setOperationAction(ISD::Constant, MVT::i32, Legal);
   setOperationAction(ISD::UNDEF, MVT::i32, Legal);
@@ -70,6 +72,9 @@ RusTargetLowering::RusTargetLowering(const TargetMachine &TM,
 
   setOperationAction(ISD::BR, MVT::Other, Legal);
   setOperationAction(ISD::BR_CC, MVT::i32, Custom);
+
+  setOperationAction(ISD::LOAD, MVT::i32, Legal);
+  setOperationAction(ISD::STORE, MVT::i32, Legal);
 
   setOperationAction(ISD::FRAMEADDR, MVT::i32, Legal);
 }
@@ -299,7 +304,6 @@ SDValue RusTargetLowering::LowerCall(TargetLowering::CallLoweringInfo &CLI,
   if (GlobalAddressSDNode *S = dyn_cast<GlobalAddressSDNode>(Callee)) {
     // llvm_unreachable("How do i suppose to lower this?");
     const GlobalValue *GV = S->getGlobal();
-    assert(getTargetMachine().shouldAssumeDSOLocal(GV));
     Callee = DAG.getTargetGlobalAddress(GV, DL, PtrVT, 0, 0);
   }
 
